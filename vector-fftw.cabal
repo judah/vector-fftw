@@ -1,0 +1,27 @@
+Name:                vector-fftw
+
+Version:             0.1
+Synopsis:            TODO
+Description:         TODO
+License:             BSD3
+License-file:        LICENSE
+Author:              Judah Jacobson
+Maintainer:          Judah Jacobson <judah.jacobson@gmail.com>
+Copyright:           (c) Judah Jacobson, 2010
+Category:            Math
+Build-type:          Simple
+Cabal-version:       >=1.2
+
+
+Library
+  Exposed-modules:     
+        Math.FFT.Vector.Base
+  
+  Build-depends: base==4.* && < 4.4, vector==0.7.*, primitive==0.3.*
+  Extra-libraries: fftw3
+
+  Extensions: ForeignFunctionInterface
+
+  -- XXX MacPorts-only
+  include-dirs: /opt/local/include
+  Extra-lib-dirs: /opt/local/lib

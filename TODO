@@ -1,0 +1,3 @@
+ - Thread safety of plans.
+ - Explicit versions in build-depends.
+ - Remove the /opt/local additions.
