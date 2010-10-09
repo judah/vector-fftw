@@ -1,13 +1,29 @@
 -- | A basic interface between Vectors and the fftw library.
-module Math.FFT.Vector.Base where
+module Math.FFT.Vector.Base(
+            -- * Planners
+            Planner(..),
+            planOfType,
+            PlanType(..),
+            plan,
+            run,
+            -- * Plans
+            Plan(),
+            planInputSize,
+            planOutputSize,
+            execute,
+            ) where
 
 import qualified Data.Vector.Storable as VS
+import qualified Data.Vector.Storable.Mutable as MS
 import qualified Data.Vector.Generic as V
-import Control.Monad.Primitive
-import Data.Complex as DC
+import qualified Data.Vector.Unboxed as U
+import qualified Data.Vector.Unboxed.Mutable as UM
+import Control.Monad.Primitive (RealWorld)
+import Control.Monad(forM_)
+import Data.Complex
 import Foreign
 import Foreign.C
-import Data.Bits
+import Data.Bits ( (.&.) )
 
 
 #include <fftw3.h>
@@ -48,56 +64,75 @@ newPlan = fmap CPlan . newForeignPtr fftw_destroy_plan
 ----------------------------------------
 -- vector-fftw plans
 
-data Plan sh a b = Plan {
-                    planInput :: VS.MVector RealWorld a,
-                    planOutput :: VS.MVector RealWorld b,
+data Plan a b = Plan {
+                    planInput :: !(VS.MVector RealWorld a),
+                    planOutput :: !(VS.MVector RealWorld b),
                     planExecute :: IO ()
                 }
 
-{-
--- TODO: Allow arbitrary Shape sh
-execute :: (Storable a, Elt a, Storable b, Elt b)
-            => Plan (Z:.Int) a b -> Array (Z:.Int) a -> Array (Z:.Int) b
-execute p a
-    | extent a /= planInputSize p = error "execute: shape mismatch: expected "
-                                        ++ show (planInputSize p)
-                                        ++ ", got " ++ show (extent a)
-    | otherwise = unsafePerformIO
-                        $ withForeignPtr (planInputArray p) $ \p_in ->
-                        $ withForeignPtr (planOutputArray p) $ \p_out -> do
-                            forM_ [0..n-1] $ \k -> pokeElemOff p_in k $ a :! (Z:.k)
-                            planExecute p
-                            -- TODO: Hacky McHackerstein!
-                            return $! force $ fromFunction (Z:.n)
-                                                (\_:.k -> unsafeInlineIO
-                                                            $ peekElemOff p_out k)
+planInputSize :: Storable a => Plan a b -> Int
+planInputSize = MS.length . planInput
+
+planOutputSize :: Storable b => Plan a b -> Int
+planOutputSize = MS.length . planOutput
+
+execute :: (Storable a, Storable b, U.Unbox a, U.Unbox b)
+            => Plan a b -> U.Vector a -> U.Vector b
+execute Plan{..} v
+    | n /= V.length v
+        = error $ "execute: size mismatch; expected " ++ show n
+                    ++ ", got " ++ show (V.length v)
+    | otherwise = unsafePerformIO $ do
+                        forM_ [0..n-1] $ \k -> MS.unsafeWrite planInput k
+                                                $ V.unsafeIndex v k
+                        planExecute
+                        v <- UM.unsafeNew n
+                        forM_ [0..m-1] $ \k -> MS.unsafeRead planOutput k
+                                                >>= UM.unsafeWrite v k
+                        U.unsafeFreeze v
   where
-    _:.n = extent a
+    n = MS.length planInput
+    m = MS.length planOutput
 
 -----------------------
 -- Planners: methods of plan creation.
 
-data Planner sh a b = Planner {
-                        plannerSizes :: sh -> (sh,sh) -- (input,output)
-                        creationSizeFromInput :: sh -> sh,
-                        makePlan :: sh -> Ptr a -> Ptr b -> CFlags -> IO (Ptr CPlan),
-                        normalizeInput :: sh -> Plan sh a b -> Plan sh a b
+data Planner a b = Planner {
+                        inputSize :: Int -> Int,
+                        outputSize :: Int -> Int,
+                        creationSizeFromInt :: Int -> Int,
+                        makePlan :: Int -> Ptr a -> Ptr b -> CFlags -> IO (Ptr CPlan),
+                        normalization :: Int -> Plan a b -> Plan a b
                     }
 
 
 planOfType :: (Storable a, Storable b) => PlanType
-                                -> Planner Int a b -> Int -> Plan Int a b
+                                -> Planner a b -> Int -> Plan a b
 planOfType ptype Planner{..} n
-  | inputSize n <= 0 || outputSize n <= 0 = error "Can't (yet) plan for empty arrays!"
+  | m_in <= 0 || m_out <= 0 = error "Can't (yet) plan for empty arrays!"
   | otherwise  = unsafePerformIO $ do
-    planInput@(MArray _ inFP) <- newFFTWArr_ $ inputSize n
-    planOutput@(MArray _ outFP) <- newFFTWArr_ $ outputSize n
-    withForeignPtr inFP $ \inP -> withForeignPtr outFP $ \outP -> do
-    pPlan <- makePlan (toEnum n) inP outP $ flagsInt ptype DestroyInput
+    planInput <- MS.unsafeNew m_in
+    planOutput <- MS.unsafeNew m_out
+    MS.unsafeWith planInput $ \inP -> MS.unsafeWith planOutput $ \outP -> do
+    pPlan <- makePlan (toEnum n) inP outP $ planInitFlags ptype DestroyInput
     cPlan <- newPlan pPlan
-    let planExecute = withPlan cPlan fftw_execute
+    -- Use unsafeWith here to ensure that the Storable MVectors' ForeignPtrs
+    -- aren't released too soon:
+    let planExecute = MS.unsafeWith planInput $ \_ ->
+                        MS.unsafeWith planOutput $ \_ ->
+                          withPlan cPlan fftw_execute
     return $ normalization n $ Plan {..}
+  where
+    m_in = inputSize n
+    m_out = outputSize n
 
 plan :: (Storable a, Storable b) => Planner a b -> Int -> Plan a b
 plan = planOfType Estimate
--}
+
+----------------
+
+run :: (Storable a, Storable b, U.Unbox a, U.Unbox b)
+            => Planner a b -> U.Vector a -> U.Vector b
+run p v = execute
+            (planOfType Estimate p $ creationSizeFromInt p $ V.length v)
+            v

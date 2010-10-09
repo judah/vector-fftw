@@ -1,3 +1,4 @@
  - Thread safety of plans.
  - Explicit versions in build-depends.
  - Remove the /opt/local additions.
+ - Generalize to all types from Data.Vector.Generic?
