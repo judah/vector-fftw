@@ -20,7 +20,7 @@ Library
   Build-depends: base==4.* && < 4.4, vector==0.7.*, primitive==0.3.*
   Extra-libraries: fftw3
 
-  Extensions: ForeignFunctionInterface
+  Extensions: ForeignFunctionInterface, RecordWildCards
 
   -- XXX MacPorts-only
   include-dirs: /opt/local/include
