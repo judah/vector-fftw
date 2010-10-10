@@ -3,10 +3,10 @@ module Math.FFT.Vector.Invertible(
                     run,
                     plan,
                     execute,
-                    -- * 'Complex'-to-'Complex' transforms 
+                    -- * Complex-to-complex transforms
                     U.dft,
                     idft,
-                    -- * 'Real'-to-'Complex' transforms 
+                    -- * Real-to-complex transforms
                     U.dftR2C,
                     dftC2R,
                     -- * Discrete cosine transforms

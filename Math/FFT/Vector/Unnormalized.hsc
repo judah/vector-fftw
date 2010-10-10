@@ -4,10 +4,10 @@ module Math.FFT.Vector.Unnormalized(
                     run,
                     plan,
                     execute,
-                    -- * 'Complex'-to-'Complex' transforms 
+                    -- * Complex-to-complex transforms
                     dft,
                     idft,
-                    -- * 'Real'-to-'Complex' transforms 
+                    -- * Real-to-complex transforms
                     dftC2R,
                     dftR2C,
                     -- * Discrete cosine transforms
