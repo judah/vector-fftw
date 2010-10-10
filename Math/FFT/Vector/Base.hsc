@@ -89,6 +89,7 @@ planInputSize = MS.length . planInput
 planOutputSize :: Storable b => Plan a b -> Int
 planOutputSize = MS.length . planOutput
 
+{-# INLINE execute #-}
 execute :: (Storable a, Storable b, U.Unbox a, U.Unbox b)
             => Plan a b -> U.Vector a -> U.Vector b
 execute Plan{..} v
@@ -119,6 +120,7 @@ data Planner a b = Planner {
                     }
 
 
+{-# INLINE planOfType #-}
 planOfType :: (Storable a, Storable b) => PlanType
                                 -> Planner a b -> Int -> Plan a b
 planOfType ptype Planner{..} n
@@ -142,6 +144,7 @@ planOfType ptype Planner{..} n
 plan :: (Storable a, Storable b) => Planner a b -> Int -> Plan a b
 plan = planOfType Estimate
 
+{-# INLINE run #-}
 run :: (Storable a, Storable b, U.Unbox a, U.Unbox b)
             => Planner a b -> U.Vector a -> U.Vector b
 run p v = execute
