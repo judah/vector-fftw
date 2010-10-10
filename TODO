@@ -16,3 +16,4 @@
  - Create performance benchmarks using criterion.
  - Get the inlining to work properly, both when using "run" and when using
    "plan" plus several executes.
+ - Size-zero input vectors?
