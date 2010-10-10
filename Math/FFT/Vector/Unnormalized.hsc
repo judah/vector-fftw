@@ -3,7 +3,6 @@ module Math.FFT.Vector.Unnormalized(
                     run,
                     plan,
                     execute,
-                    PlanType(..),
                     dft,
                     idft,
                     dftC2R,

@@ -3,4 +3,3 @@
  - Explicit versions in build-depends.
  - Remove the /opt/local additions.
  - Generalize to all types from Data.Vector.Generic?
- - Better separation of internal ops (e.g., Planner(..)) in Base.hsc.
