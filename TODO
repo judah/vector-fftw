@@ -7,7 +7,7 @@
  - Rest of the orthonormal transforms.
  - Call Orthonormal.dct3 really idct2?
  - Tests that I'm using all of vector's unsafe ops correctly.
- - General tests (incl. that the invertibility/orthonormality is true).
+ - Tests for Unnormalized, that <Fu,v>==<u,F^*v>.
  - Can we get more accuracy wrt normalizations?
  - Add a note that this doesn't return [1..5] (b/c output is even)
         run dftC2R $ run dftR2C $ fromList [1..5]
