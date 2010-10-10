@@ -126,7 +126,6 @@ planOfType ptype Planner{..} n
   | otherwise  = unsafePerformIO $ do
     planInput <- MS.unsafeNew m_in
     planOutput <- MS.unsafeNew m_out
-    print (m_in, m_out)
     MS.unsafeWith planInput $ \inP -> MS.unsafeWith planOutput $ \outP -> do
     pPlan <- makePlan (toEnum n) inP outP $ planInitFlags ptype DestroyInput
     cPlan <- newPlan pPlan
