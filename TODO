@@ -3,8 +3,6 @@
  - Explicit versions in build-depends.
  - Remove the /opt/local additions.
  - Generalize to all types from Data.Vector.Generic?
- - For Invertible/Orthogonal, don't directly export functions from
-   other modules, so each way is more self-consistent in Haddock.
  - Maybe better to have normalizeInput/output :: Vector -> Vector?
  - Rest of the orthonormal transforms.
  - Call Orthonormal.dct3 really idct2?
