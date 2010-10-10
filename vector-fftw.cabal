@@ -15,6 +15,7 @@ Cabal-version:       >=1.2
 
 Library
   Exposed-modules:     
+        Math.FFT.Vector.Unnormalized
         Math.FFT.Vector.Base
   
   Build-depends: base==4.* && < 4.4, vector==0.7.*, primitive==0.3.*

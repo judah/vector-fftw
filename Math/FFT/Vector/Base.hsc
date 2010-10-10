@@ -11,6 +11,9 @@ module Math.FFT.Vector.Base(
             planInputSize,
             planOutputSize,
             execute,
+            -- * Unsafe C stuff
+            CFlags,
+            CPlan,
             ) where
 
 import qualified Data.Vector.Storable as VS
@@ -22,7 +25,7 @@ import Control.Monad.Primitive (RealWorld)
 import Control.Monad(forM_)
 import Foreign (Storable, Ptr, unsafePerformIO, FunPtr,
                 ForeignPtr, withForeignPtr, newForeignPtr)
-import Foreign.C (CUInt)
+import Foreign.C (CInt, CUInt)
 import Data.Bits ( (.&.) )
 
 
@@ -101,8 +104,8 @@ execute Plan{..} v
 data Planner a b = Planner {
                         inputSize :: Int -> Int,
                         outputSize :: Int -> Int,
-                        creationSizeFromInt :: Int -> Int,
-                        makePlan :: Int -> Ptr a -> Ptr b -> CFlags -> IO (Ptr CPlan),
+                        creationSizeFromInput :: Int -> Int,
+                        makePlan :: CInt -> Ptr a -> Ptr b -> CFlags -> IO (Ptr CPlan),
                         normalization :: Int -> Plan a b -> Plan a b
                     }
 
@@ -135,5 +138,5 @@ plan = planOfType Estimate
 run :: (Storable a, Storable b, U.Unbox a, U.Unbox b)
             => Planner a b -> U.Vector a -> U.Vector b
 run p v = execute
-            (planOfType Estimate p $ creationSizeFromInt p $ V.length v)
+            (planOfType Estimate p $ creationSizeFromInput p $ V.length v)
             v
