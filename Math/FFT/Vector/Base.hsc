@@ -15,10 +15,12 @@ module Math.FFT.Vector.Base(
             CFlags,
             CPlan,
             -- * Normalization helpers
+            Scalable(..),
             modifyInput,
             modifyOutput,
             constMultOutput,
             multC,
+            unsafeModify,
             ) where
 
 import qualified Data.Vector.Storable as VS
@@ -97,7 +99,7 @@ execute Plan{..} v
                         forM_ [0..n-1] $ \k -> MS.unsafeWrite planInput k
                                                 $ V.unsafeIndex v k
                         planExecute
-                        v' <- UM.unsafeNew n
+                        v' <- UM.unsafeNew m
                         forM_ [0..m-1] $ \k -> MS.unsafeRead planOutput k
                                                 >>= UM.unsafeWrite v' k
                         U.unsafeFreeze v'
@@ -124,6 +126,7 @@ planOfType ptype Planner{..} n
   | otherwise  = unsafePerformIO $ do
     planInput <- MS.unsafeNew m_in
     planOutput <- MS.unsafeNew m_out
+    print (m_in, m_out)
     MS.unsafeWith planInput $ \inP -> MS.unsafeWith planOutput $ \outP -> do
     pPlan <- makePlan (toEnum n) inP outP $ planInitFlags ptype DestroyInput
     cPlan <- newPlan pPlan
@@ -176,6 +179,11 @@ constMultOutput !s = modifyOutput (multC s)
 
 {-# INLINE multC #-}
 multC :: (Storable a, Scalable a) => Double -> MS.MVector RealWorld a -> IO ()
-multC !s !a = forM_ [0..n-1] $ \k -> MS.unsafeRead a k >>= MS.unsafeWrite a k . scaleByD s
-  where n = MS.length a
+multC !s v = forM_ [0..n-1] $ \k -> unsafeModify v k (scaleByD s)
+  where !n = MS.length v
 
+-- | Helper function; seems like it should be in the vector package...
+{-# INLINE unsafeModify #-}
+unsafeModify :: (Storable a)
+                => MS.MVector RealWorld a -> Int -> (a -> a) -> IO ()
+unsafeModify v k f = MS.unsafeRead v k >>= MS.unsafeWrite v k . f

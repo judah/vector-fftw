@@ -17,6 +17,7 @@ Library
   Exposed-modules:     
         Math.FFT.Vector.Unnormalized
         Math.FFT.Vector.Invertible
+        Math.FFT.Vector.Orthogonal
         Math.FFT.Vector.Plan
 
   Other-modules:

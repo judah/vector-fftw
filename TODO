@@ -6,3 +6,15 @@
  - For Invertible/Orthogonal, don't directly export functions from
    other modules, so each way is more self-consistent in Haddock.
  - Maybe better to have normalizeInput/output :: Vector -> Vector?
+ - Rest of the orthonormal transforms.
+ - Call Orthonormal.dct3 really idct2?
+ - Tests that I'm using all of vector's unsafe ops correctly.
+ - General tests (incl. that the invertibility/orthonormality is true).
+ - Can we get more accuracy wrt normalizations?
+ - Add a note that this doesn't return [1..5] (b/c output is even)
+        run dftC2R $ run dftR2C $ fromList [1..5]
+   and must be replaced by:
+        execute (plan dftC2R 5) $ run dftR2C $ fromList [1..5]
+ - Create performance benchmarks using criterion.
+ - Get the inlining to work properly, both when using "run" and when using
+   "plan" plus several executes.
