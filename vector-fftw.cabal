@@ -16,15 +16,17 @@ Cabal-version:       >=1.2
 Library
   Exposed-modules:     
         Math.FFT.Vector.Unnormalized
+        Math.FFT.Vector.Invertible
         Math.FFT.Vector.Plan
 
   Other-modules:
         Math.FFT.Vector.Base
   
-  Build-depends: base==4.* && < 4.4, vector==0.7.*, primitive==0.3.*
+  Build-depends: base==4.* && < 4.4, vector==0.7.*, primitive==0.3.*,
+                 storable-complex==0.2.*
   Extra-libraries: fftw3
 
-  Extensions: ForeignFunctionInterface, RecordWildCards
+  Extensions: ForeignFunctionInterface, RecordWildCards, BangPatterns, FlexibleInstances
   ghc-options: -Wall
 
   -- XXX MacPorts-only

@@ -14,6 +14,11 @@ module Math.FFT.Vector.Base(
             -- * Unsafe C stuff
             CFlags,
             CPlan,
+            -- * Normalization helpers
+            modifyInput,
+            modifyOutput,
+            constMultOutput,
+            multC,
             ) where
 
 import qualified Data.Vector.Storable as VS
@@ -27,6 +32,8 @@ import Foreign (Storable, Ptr, unsafePerformIO, FunPtr,
                 ForeignPtr, withForeignPtr, newForeignPtr)
 import Foreign.C (CInt, CUInt)
 import Data.Bits ( (.&.) )
+import Data.Complex(Complex(..))
+import Foreign.Storable.Complex()
 
 
 
@@ -133,10 +140,42 @@ planOfType ptype Planner{..} n
 plan :: (Storable a, Storable b) => Planner a b -> Int -> Plan a b
 plan = planOfType Estimate
 
-----------------
-
 run :: (Storable a, Storable b, U.Unbox a, U.Unbox b)
             => Planner a b -> U.Vector a -> U.Vector b
 run p v = execute
             (planOfType Estimate p $ creationSizeFromInput p $ V.length v)
             v
+
+---------------------------
+-- For scaling input/output:
+
+class Scalable a where
+    scaleByD :: Double -> a -> a
+    {-# INLINE scaleByD #-}
+
+instance Scalable Double where
+    scaleByD = (*)
+    {-# INLINE scaleByD #-}
+
+instance Scalable (Complex Double) where
+    scaleByD s (x:+y) = s*x :+ s*y
+    {-# INLINE scaleByD #-}
+
+
+{-# INLINE modifyInput #-}
+modifyInput :: (MS.MVector RealWorld a -> IO ()) -> Plan a b -> Plan a b
+modifyInput f p@Plan{..} = p {planExecute = f planInput >> planExecute}
+
+{-# INLINE modifyOutput #-}
+modifyOutput :: (MS.MVector RealWorld b -> IO ()) -> Plan a b -> Plan a b
+modifyOutput f p@Plan{..} = p {planExecute = planExecute >> f planOutput}
+
+{-# INLINE constMultOutput #-}
+constMultOutput :: (Storable b, Scalable b) => Double -> Plan a b -> Plan a b
+constMultOutput !s = modifyOutput (multC s)
+
+{-# INLINE multC #-}
+multC :: (Storable a, Scalable a) => Double -> MS.MVector RealWorld a -> IO ()
+multC !s !a = forM_ [0..n-1] $ \k -> MS.unsafeRead a k >>= MS.unsafeWrite a k . scaleByD s
+  where n = MS.length a
+

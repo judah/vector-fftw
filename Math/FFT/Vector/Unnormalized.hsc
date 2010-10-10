@@ -1,16 +1,21 @@
 -- | Unnormalized versions of the transforms.  This is faster but may cause math problems.
 module Math.FFT.Vector.Unnormalized(
+                    -- * Creating and executing 'Plan's
                     run,
                     plan,
                     execute,
+                    -- * 'Complex'-to-'Complex' transforms 
                     dft,
                     idft,
+                    -- * 'Real'-to-'Complex' transforms 
                     dftC2R,
                     dftR2C,
+                    -- * Discrete cosine transforms
                     dct1,
                     dct2,
                     dct3,
                     dct4,
+                    -- * Discrete sine transforms
                     dst1,
                     dst2,
                     dst3,
