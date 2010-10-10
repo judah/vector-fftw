@@ -21,6 +21,7 @@ Library
   Extra-libraries: fftw3
 
   Extensions: ForeignFunctionInterface, RecordWildCards
+  ghc-options: -Wall
 
   -- XXX MacPorts-only
   include-dirs: /opt/local/include

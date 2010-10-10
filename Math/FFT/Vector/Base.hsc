@@ -20,10 +20,11 @@ import qualified Data.Vector.Unboxed as U
 import qualified Data.Vector.Unboxed.Mutable as UM
 import Control.Monad.Primitive (RealWorld)
 import Control.Monad(forM_)
-import Data.Complex
-import Foreign
-import Foreign.C
+import Foreign (Storable, Ptr, unsafePerformIO, FunPtr,
+                ForeignPtr, withForeignPtr, newForeignPtr)
+import Foreign.C (CUInt)
 import Data.Bits ( (.&.) )
+
 
 
 #include <fftw3.h>
@@ -86,10 +87,10 @@ execute Plan{..} v
                         forM_ [0..n-1] $ \k -> MS.unsafeWrite planInput k
                                                 $ V.unsafeIndex v k
                         planExecute
-                        v <- UM.unsafeNew n
+                        v' <- UM.unsafeNew n
                         forM_ [0..m-1] $ \k -> MS.unsafeRead planOutput k
-                                                >>= UM.unsafeWrite v k
-                        U.unsafeFreeze v
+                                                >>= UM.unsafeWrite v' k
+                        U.unsafeFreeze v'
   where
     n = MS.length planInput
     m = MS.length planOutput
