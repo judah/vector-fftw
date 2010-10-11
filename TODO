@@ -18,3 +18,8 @@
    "plan" plus several executes.
  - Size-zero input vectors?
  - Is -fexcess-precision necessary?
+ - Better timings:
+   - Bench normalizations
+   - Put Plans in a list and apply them separately (to prevent unboxing), and
+     see how much of a performance hit it is.
+
