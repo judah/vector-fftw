@@ -9,7 +9,8 @@ module Math.FFT.Vector.Plan(
                 Plan(),
                 planInputSize,
                 planOutputSize,
-                execute
+                execute,
+                unsafeExecuteM,
                 ) where
 
 import Math.FFT.Vector.Base

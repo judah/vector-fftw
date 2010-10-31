@@ -27,7 +27,8 @@ Library
                  storable-complex==0.2.*
   Extra-libraries: fftw3
 
-  Extensions: ForeignFunctionInterface, RecordWildCards, BangPatterns, FlexibleInstances
+  Extensions: ForeignFunctionInterface, RecordWildCards, BangPatterns, FlexibleInstances,
+                ScopedTypeVariables
   ghc-options: -Wall
 
   Ghc-Options: -O2

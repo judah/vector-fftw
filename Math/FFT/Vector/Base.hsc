@@ -11,6 +11,7 @@ module Math.FFT.Vector.Base(
             planInputSize,
             planOutputSize,
             execute,
+            unsafeExecuteM,
             -- * Unsafe C stuff
             CFlags,
             CPlan,
@@ -28,7 +29,8 @@ import qualified Data.Vector.Storable.Mutable as MS
 import qualified Data.Vector.Generic as V
 import qualified Data.Vector.Unboxed as U
 import qualified Data.Vector.Unboxed.Mutable as UM
-import Control.Monad.Primitive (RealWorld)
+import Control.Monad.Primitive (RealWorld,PrimMonad(..),
+            unsafePrimToPrim, unsafePrimToIO)
 import Control.Monad(forM_)
 import Foreign (Storable, Ptr, unsafePerformIO, FunPtr,
                 ForeignPtr, withForeignPtr, newForeignPtr)
@@ -107,6 +109,28 @@ execute Plan{..} v
   where
     n = MS.length planInput
     m = MS.length planOutput
+
+{-# INLINE unsafeExecuteM #-}
+unsafeExecuteM :: forall m a . (PrimMonad m, Storable a, U.Unbox a)
+            => Plan a a -> U.MVector (PrimState m) a -> m ()
+unsafeExecuteM Plan{..} v
+    | n /= UM.length v || n /= m
+        = error $ "executeM: size mismatch; expected " ++ show (n,m)
+                    ++ ", got " ++ show (UM.length v, UM.length v)
+    | otherwise = unsafePrimToPrim act
+  where
+    n = MS.length planInput
+    m = MS.length planOutput
+
+    act :: IO ()
+    act = do
+            forM_ [0..n-1] $ \k -> unsafePrimToIO (UM.unsafeRead v k :: m a)
+                                    >>= MS.unsafeWrite planInput k
+            unsafePrimToPrim planExecute
+            forM_ [0..n-1] $ \k -> MS.unsafeRead planOutput k
+                                    >>= unsafePrimToIO . (UM.unsafeWrite v k
+                                                            :: a -> m ())
+
 
 -----------------------
 -- Planners: methods of plan creation.
