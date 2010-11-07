@@ -58,8 +58,8 @@ foreign import ccall unsafe fftw_plan_dft_c2r_1d
 foreign import ccall unsafe fftw_plan_r2r_1d
     :: CInt -> Ptr Double -> Ptr Double -> CKind -> CFlags -> IO (Ptr CPlan)
 
-dft1D :: CDirection -> Planner (Complex Double) (Complex Double)
-dft1D d = Planner {
+dft1D :: CDirection -> Transform (Complex Double) (Complex Double)
+dft1D d = Transform {
             inputSize = id,
             outputSize = id,
             creationSizeFromInput = id,
@@ -70,17 +70,17 @@ dft1D d = Planner {
 -- | A forward discrete Fourier transform.  The output and input sizes are the same (@n@).
 -- 
 -- @y_k = sum_(j=0)^(n-1) x_j e^(-2pi i j k/n)@
-dft :: Planner (Complex Double) (Complex Double)
+dft :: Transform (Complex Double) (Complex Double)
 dft = dft1D (#const FFTW_FORWARD)
 
 -- | A backward discrete Fourier transform.  The output and input sizes are the same (@n@).
 -- 
 -- @y_k = sum_(j=0)^(n-1) x_j e^(2pi i j k/n)@
-idft :: Planner (Complex Double) (Complex Double)
+idft :: Transform (Complex Double) (Complex Double)
 idft = dft1D (#const FFTW_BACKWARD)
 
-dftR2C :: Planner Double (Complex Double)
-dftR2C = Planner {
+dftR2C :: Transform Double (Complex Double)
+dftR2C = Transform {
             inputSize = id,
             outputSize = \n -> n `div` 2 + 1,
             creationSizeFromInput = id,
@@ -88,8 +88,8 @@ dftR2C = Planner {
             normalization = const id
         }
 
-dftC2R :: Planner (Complex Double) Double
-dftC2R = Planner {
+dftC2R :: Transform (Complex Double) Double
+dftC2R = Transform {
             inputSize = \n -> n `div` 2 + 1,
             outputSize = id,
             creationSizeFromInput = \n -> 2 * (n-1),
@@ -97,8 +97,8 @@ dftC2R = Planner {
             normalization = const id
         }
 
-r2rPlanner :: CKind -> Planner Double Double
-r2rPlanner kind = Planner {
+r2rTransform :: CKind -> Transform Double Double
+r2rTransform kind = Transform {
                     inputSize = id,
                     outputSize = id,
                     creationSizeFromInput = id,
@@ -113,47 +113,47 @@ r2rPlanner kind = Planner {
 -- | A type-1 discrete cosine transform.  
 --
 -- @y_k = x_0 + (-1)^k x_(n-1) + 2 sum_(j=1)^(n-2) x_j cos(pi j k\/(n-1))@
-dct1 :: Planner Double Double
-dct1 = r2rPlanner (#const  FFTW_REDFT00)
+dct1 :: Transform Double Double
+dct1 = r2rTransform (#const  FFTW_REDFT00)
 
 -- | A type-2 discrete cosine transform.  
 --
 -- @y_k = 2 sum_(j=0)^(n-1) x_j cos(pi(j+1\/2)k\/n)@
-dct2 :: Planner Double Double
-dct2 = r2rPlanner (#const  FFTW_REDFT10)
+dct2 :: Transform Double Double
+dct2 = r2rTransform (#const  FFTW_REDFT10)
 
 -- | A type-3 discrete cosine transform.  
 --
 -- @y_k = x_0 + 2 sum_(j=1)^(n-1) x_j cos(pi j(k+1\/2)\/n)@
-dct3 :: Planner Double Double
-dct3 = r2rPlanner (#const  FFTW_REDFT01)
+dct3 :: Transform Double Double
+dct3 = r2rTransform (#const  FFTW_REDFT01)
 
 -- | A type-4 discrete cosine transform.  
 --
 -- @y_k = 2 sum_(j=0)^(n-1) x_j cos(pi(j+1\/2)(k+1\/2)\/n)@
-dct4 :: Planner Double Double
-dct4 = r2rPlanner (#const  FFTW_REDFT11)
+dct4 :: Transform Double Double
+dct4 = r2rTransform (#const  FFTW_REDFT11)
 
 -- | A type-1 discrete sine transform.
 -- 
 -- @y_k = 2 sum_(j=0)^(n-1) x_j sin(pi(j+1)(k+1)\/(n+1))@
-dst1 :: Planner Double Double
-dst1 = r2rPlanner (#const  FFTW_RODFT00)
+dst1 :: Transform Double Double
+dst1 = r2rTransform (#const  FFTW_RODFT00)
 
 -- | A type-2 discrete sine transform.
 -- 
 -- @y_k = 2 sum_(j=0)^(n-1) x_j sin(pi(j+1\/2)(k+1)\/n)@
-dst2 :: Planner Double Double
-dst2 = r2rPlanner (#const  FFTW_RODFT10)
+dst2 :: Transform Double Double
+dst2 = r2rTransform (#const  FFTW_RODFT10)
 
 -- | A type-3 discrete sine transform.  
 --
 -- @y_k = (-1)^k x_(n-1) + 2 sum_(j=0)^(n-2) x_j sin(pi(j+1)(k+1\/2)/n)@
-dst3 :: Planner Double Double
-dst3 = r2rPlanner (#const  FFTW_RODFT01)
+dst3 :: Transform Double Double
+dst3 = r2rTransform (#const  FFTW_RODFT01)
 
 -- | A type-4 discrete sine transform.
 --
 -- @y_k = sum_(j=0)^(n-1) x_j sin(pi(j+1\/2)(k+1\/2)\/n)@
-dst4 :: Planner Double Double
-dst4 = r2rPlanner (#const FFTW_RODFT11)
+dst4 :: Transform Double Double
+dst4 = r2rTransform (#const FFTW_RODFT11)

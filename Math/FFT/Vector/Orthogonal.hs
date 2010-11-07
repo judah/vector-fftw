@@ -39,21 +39,21 @@ import Control.Monad.Primitive(RealWorld)
 -- | A discrete Fourier transform. The output and input sizes are the same (@n@).
 --
 -- @y_k = (1\/sqrt n) sum_(j=0)^(n-1) x_j e^(-2pi i j k\/n)@
-dft :: Planner (Complex Double) (Complex Double)
+dft :: Transform (Complex Double) (Complex Double)
 dft = U.dft {normalization = \n -> constMultOutput $ 1 / sqrt (toEnum n)}
 
 -- | An inverse discrete Fourier transform.  The output and input sizes are the same (@n@).
 -- 
 -- @y_k = (1\/sqrt n) sum_(j=0)^(n-1) x_j e^(2pi i j k\/n)@
-idft :: Planner (Complex Double) (Complex Double)
+idft :: Transform (Complex Double) (Complex Double)
 idft = U.idft {normalization = \n -> constMultOutput $ 1 / sqrt (toEnum n)}
 
-dftR2C :: Planner Double (Complex Double)
+dftR2C :: Transform Double (Complex Double)
 dftR2C = U.dftR2C {normalization = \n -> modifyOutput $
                     complexR2CScaling (sqrt 2) n
         }
 
-dftC2R :: Planner (Complex Double) Double
+dftC2R :: Transform (Complex Double) Double
 dftC2R = U.dftC2R {normalization = \n -> modifyInput $
                     complexR2CScaling (sqrt 0.5) n
         }
@@ -82,7 +82,7 @@ complexR2CScaling !t !n !a = do
 -- | A type-4 discrete cosine transform.  It is its own inverse.
 -- 
 -- @y_k = (1\/sqrt n) sum_(j=0)^(n-1) x_j cos(pi(j+1\/2)(k+1\/2)\/n)@
-dct4 :: Planner Double Double
+dct4 :: Transform Double Double
 dct4 = U.dct4 {normalization = \n -> constMultOutput $ 1 / sqrt (2 * toEnum n)}
 
 -- | A type-2 discrete cosine transform.  Its inverse is 'dct3'.
@@ -90,7 +90,7 @@ dct4 = U.dct4 {normalization = \n -> constMultOutput $ 1 / sqrt (2 * toEnum n)}
 -- @y_k = w(k) sum_(j=0)^(n-1) x_j cos(pi(j+1\/2)k\/n);@
 -- where
 -- @w(0)=1\/sqrt n@, and @w(k)=sqrt(2\/n)@ for @k>0@.
-dct2 :: Planner Double Double
+dct2 :: Transform Double Double
 dct2 = U.dct2 {normalization = \n -> modifyOutput $ \a -> do
     let n' = toEnum n
     let !s1 = sqrt $ 1 / (4*n')
@@ -104,7 +104,7 @@ dct2 = U.dct2 {normalization = \n -> modifyOutput $ \a -> do
 -- @y_k = (-1)^k w(n-1) x_(n-1) + 2 sum_(j=0)^(n-2) w(j) x_j sin(pi(j+1)(k+1\/2)/n);@
 -- where
 -- @w(0)=1\/sqrt(n)@, and @w(k)=1/sqrt(2n)@ for @k>0@.
-dct3 :: Planner Double Double
+dct3 :: Transform Double Double
 dct3 = U.dct3 {normalization = \n -> modifyInput $ \a -> do
     let n' = toEnum n
     let !s1 = sqrt $ 1 / n'

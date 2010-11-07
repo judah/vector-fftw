@@ -1,7 +1,7 @@
 -- | A basic interface between Vectors and the fftw library.
 module Math.FFT.Vector.Base(
-            -- * Planners
-            Planner(..),
+            -- * Transforms
+            Transform(..),
             planOfType,
             PlanType(..),
             plan,
@@ -46,13 +46,13 @@ import Foreign.Storable.Complex()
 ---------------------
 -- Creating FFTW plans
 
--- First, the planner flags:
+-- First, the Transform flags:
 data PlanType = Estimate | Measure | Patient | Exhaustive
 data Preservation = PreserveInput | DestroyInput
 
 type CFlags = CUInt
 
--- | Marshal the planner flags for use by fftw.
+-- | Marshal the Transform flags for use by fftw.
 planInitFlags :: PlanType -> Preservation -> CFlags
 planInitFlags pt pr = planTypeInt .&. preservationInt
   where
@@ -125,7 +125,10 @@ execute Plan{..} = \v -> -- fudge the arity to make sure it's always inlined
 -- then calling @unsafeExecuteM p vIn vOut@ will throw an exception.
 executeM :: forall m v a b . 
         (PrimMonad m, MVector v a, MVector v b, Storable a, Storable b)
-            => Plan a b -> v (PrimState m) a -> v (PrimState m) b -> m ()
+            => Plan a b -- ^ The plan to run.
+            -> v (PrimState m) a  -- ^ The input vector.
+                    -> v (PrimState m) b -- ^ The output vector.
+                    -> m ()
 executeM Plan{..} = \vIn vOut ->
     if n /= M.length vIn || m /= M.length vOut
         then error $ "executeM: size mismatch; expected " L.++ show (n,m)
@@ -147,10 +150,10 @@ executeM Plan{..} = \vIn vOut ->
 
 
 -----------------------
--- Planners: methods of plan creation.
+-- Transforms: methods of plan creation.
 
 -- | A transform which may be applied to vectors of different sizes.
-data Planner a b = Planner {
+data Transform a b = Transform {
                         inputSize :: Int -> Int,
                         outputSize :: Int -> Int,
                         creationSizeFromInput :: Int -> Int,
@@ -160,8 +163,8 @@ data Planner a b = Planner {
 
 -- | Create a 'Plan' of a specific size for this transform.
 planOfType :: (Storable a, Storable b) => PlanType
-                                -> Planner a b -> Int -> Plan a b
-planOfType ptype Planner{..} n
+                                -> Transform a b -> Int -> Plan a b
+planOfType ptype Transform{..} n
   | m_in <= 0 || m_out <= 0 = error "Can't (yet) plan for empty arrays!"
   | otherwise  = unsafePerformIO $ do
     planInput <- MS.unsafeNew m_in
@@ -182,13 +185,13 @@ planOfType ptype Planner{..} n
 
 -- | Create a 'Plan' of a specific size.  This function is equivalent to
 -- @'planOfType' 'Estimate'@.
-plan :: (Storable a, Storable b) => Planner a b -> Int -> Plan a b
+plan :: (Storable a, Storable b) => Transform a b -> Int -> Plan a b
 plan = planOfType Estimate
 {-# INLINE plan #-}
 
--- | Create and run the 'Plan' for a given transform.
+-- | Create and run a 'Plan' for the given transform.
 run :: (Vector v a, Vector v b, Storable a, Storable b)
-            => Planner a b -> v a -> v b
+            => Transform a b -> v a -> v b
 run p = \v -> execute
             (planOfType Estimate p $ creationSizeFromInput p $ V.length v)
             v

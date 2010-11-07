@@ -1,6 +1,6 @@
 module Math.FFT.Vector.Plan(
-                -- * Planners
-                Planner(),
+                -- * Transform
+                Transform(),
                 planOfType,
                 PlanType(..),
                 plan,
