@@ -16,8 +16,8 @@ module Math.FFT.Vector.Unnormalized(
                     dft,
                     idft,
                     -- * Real-to-complex transforms
-                    dftC2R,
                     dftR2C,
+                    dftC2R,
                     -- * Real-to-real transforms
                     -- $dct_size
                     -- ** Discrete cosine transforms
@@ -79,6 +79,8 @@ dft = dft1D (#const FFTW_FORWARD)
 idft :: Transform (Complex Double) (Complex Double)
 idft = dft1D (#const FFTW_BACKWARD)
 
+-- | A forward discrete Fourier transform with real data.  If the input size is @n@,
+-- the output size will be @n \`div\` 2 + 1@.
 dftR2C :: Transform Double (Complex Double)
 dftR2C = Transform {
             inputSize = id,
@@ -88,6 +90,14 @@ dftR2C = Transform {
             normalization = const id
         }
 
+-- | A backward discrete Fourier transform which produces real data.
+--
+-- This 'Transform' behaves differently than the others:
+--  
+--  - Calling @plan dftC2R n@ creates a 'Plan' whose /output/ size is @n@, and whose
+--    /input/ size is @n \`div\` 2 + 1@.
+--
+--  - If @length v == n@, then @length (run dftC2R v) == 2*(n-1)@.
 dftC2R :: Transform (Complex Double) Double
 dftC2R = Transform {
             inputSize = \n -> n `div` 2 + 1,

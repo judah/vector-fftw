@@ -48,11 +48,23 @@ dft = U.dft {normalization = \n -> constMultOutput $ 1 / sqrt (toEnum n)}
 idft :: Transform (Complex Double) (Complex Double)
 idft = U.idft {normalization = \n -> constMultOutput $ 1 / sqrt (toEnum n)}
 
+-- | A forward discrete Fourier transform with real data.  If the input size is @n@,
+-- the output size will be @n \`div\` 2 + 1@.
 dftR2C :: Transform Double (Complex Double)
 dftR2C = U.dftR2C {normalization = \n -> modifyOutput $
                     complexR2CScaling (sqrt 2) n
         }
 
+-- | A normalized backward discrete Fourier transform which is the left inverse of
+-- 'U.dftR2C'.  (Specifically, @run dftC2R . run dftR2C == id@.)
+--
+-- This 'Transform' behaves differently than the others:
+--  
+--  - Calling @plan dftC2R n@ creates a 'Plan' whose /output/ size is @n@, and whose
+--    /input/ size is @n \`div\` 2 + 1@.
+--
+--  - If @length v == n@, then @length (run dftC2R v) == 2*(n-1)@.
+--
 dftC2R :: Transform (Complex Double) Double
 dftC2R = U.dftC2R {normalization = \n -> modifyInput $
                     complexR2CScaling (sqrt 0.5) n

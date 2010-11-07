@@ -1,5 +1,7 @@
  - Thread safety of plan creation and execution (TODO: what guarantees do we
    have from FFTW?).
+ - Better docs for c2r/r2c in all modules.
+ - Multidimensional transforms.
  - Bench and optimize the normalized transforms.
  - Explicit versions in build-depends.
  - Maybe better to have normalizeInput/output :: Vector -> Vector?
@@ -17,7 +19,7 @@
  - Size-zero input vectors?
  - Is -fexcess-precision necessary?
  - Better timings:
-   - Bench normalizations
+   - Bench (and optimize) the normalizations.
    - Put Plans in a list and apply them separately (to prevent unboxing), and
      see how much of a performance hit it is.
  - QuickCheck properties matching each of the transforms against their (slow)

@@ -50,6 +50,16 @@ import Data.Complex
 idft :: Transform (Complex Double) (Complex Double)
 idft = U.idft {normalization = \n -> constMultOutput $ 1 / toEnum n}
 
+-- | A normalized backward discrete Fourier transform which is the left inverse of
+-- 'U.dftR2C'.  (Specifically, @run dftC2R . run dftR2C == id@.)
+--
+-- This 'Transform' behaves differently than the others:
+--  
+--  - Calling @plan dftC2R n@ creates a 'Plan' whose /output/ size is @n@, and whose
+--    /input/ size is @n \`div\` 2 + 1@.
+--
+--  - If @length v == n@, then @length (run dftC2R v) == 2*(n-1)@.
+--
 dftC2R :: Transform (Complex Double) Double
 dftC2R = U.dftC2R {normalization = \n -> constMultOutput $ 1 / toEnum n}
 
