@@ -11,7 +11,7 @@ module Math.FFT.Vector.Base(
             planInputSize,
             planOutputSize,
             execute,
-            unsafeExecuteM,
+            executeM,
             -- * Unsafe C stuff
             CFlags,
             CPlan,
@@ -26,9 +26,9 @@ module Math.FFT.Vector.Base(
 
 import qualified Data.Vector.Storable as VS
 import qualified Data.Vector.Storable.Mutable as MS
-import qualified Data.Vector.Generic as V
-import qualified Data.Vector.Unboxed as U
-import qualified Data.Vector.Unboxed.Mutable as UM
+import Data.Vector.Generic as V hiding (forM_)
+import Data.Vector.Generic.Mutable as M
+import Data.List as L
 import Control.Monad.Primitive (RealWorld,PrimMonad(..),
             unsafePrimToPrim, unsafePrimToIO)
 import Control.Monad(forM_)
@@ -79,62 +79,77 @@ newPlan = fmap CPlan . newForeignPtr fftw_destroy_plan
 ----------------------------------------
 -- vector-fftw plans
 
+-- | A 'Plan' can be used to run an @fftw@ algorithm for a specific input/output size.
 data Plan a b = Plan {
                     planInput :: {-# UNPACK #-} !(VS.MVector RealWorld a),
                     planOutput :: {-# UNPACK #-} !(VS.MVector RealWorld b),
                     planExecute :: IO ()
                 }
 
+-- | The (only) valid input size for this plan.
 planInputSize :: Storable a => Plan a b -> Int
 planInputSize = MS.length . planInput
 
+-- | The (only) valid output size for this plan.
 planOutputSize :: Storable b => Plan a b -> Int
 planOutputSize = MS.length . planOutput
 
-{-# INLINE execute #-}
-execute :: (Storable a, Storable b, U.Unbox a, U.Unbox b)
-            => Plan a b -> U.Vector a -> U.Vector b
-execute Plan{..} v
-    | n /= V.length v
-        = error $ "execute: size mismatch; expected " ++ show n
-                    ++ ", got " ++ show (V.length v)
-    | otherwise = unsafePerformIO $ do
-                        forM_ [0..n-1] $ \k -> MS.unsafeWrite planInput k
+-- | Run a plan on the given 'Vector'.
+--
+-- If @'planInputSize' p /= length v@, then calling
+-- @execute p v@ will throw an exception.
+execute :: (Vector v a, Vector v b, Storable a, Storable b) 
+            => Plan a b -> v a -> v b
+execute Plan{..} = \v -> -- fudge the arity to make sure it's always inlined
+    if n /= V.length v
+        then error $ "execute: size mismatch; expected " L.++ show n
+                    L.++ ", got " L.++ show (V.length v)
+        else unsafePerformIO $ do
+                        forM_ [0..n-1] $ \k -> M.unsafeWrite planInput k
                                                 $ V.unsafeIndex v k
                         planExecute
-                        v' <- UM.unsafeNew m
-                        forM_ [0..m-1] $ \k -> MS.unsafeRead planOutput k
-                                                >>= UM.unsafeWrite v' k
-                        U.unsafeFreeze v'
+                        v' <- unsafeNew m
+                        forM_ [0..m-1] $ \k -> M.unsafeRead planOutput k
+                                                >>= M.unsafeWrite v' k
+                        V.unsafeFreeze v'
+  where
+    n = MS.length planInput
+    m = MS.length planOutput
+{-# INLINE execute #-}
+
+-- TODO: decide whether this is actually unsafe.
+-- | Run a plan on the given mutable vectors.  The same vector may be used for both
+-- input and output.
+--
+-- If @'planInputSize' p \/= length vIn@ or @'planOutputSize' p \/= length vOut@,
+-- then calling @unsafeExecuteM p vIn vOut@ will throw an exception.
+executeM :: forall m v a b . 
+        (PrimMonad m, MVector v a, MVector v b, Storable a, Storable b)
+            => Plan a b -> v (PrimState m) a -> v (PrimState m) b -> m ()
+executeM Plan{..} = \vIn vOut ->
+    if n /= M.length vIn || m /= M.length vOut
+        then error $ "executeM: size mismatch; expected " L.++ show (n,m)
+                    L.++ ", got " L.++ show (M.length vIn, M.length vOut)
+        else unsafePrimToPrim $ act vIn vOut
   where
     n = MS.length planInput
     m = MS.length planOutput
 
-{-# INLINE unsafeExecuteM #-}
-unsafeExecuteM :: forall m a . (PrimMonad m, Storable a, U.Unbox a)
-            => Plan a a -> U.MVector (PrimState m) a -> m ()
-unsafeExecuteM Plan{..} v
-    | n /= UM.length v || n /= m
-        = error $ "executeM: size mismatch; expected " ++ show (n,m)
-                    ++ ", got " ++ show (UM.length v, UM.length v)
-    | otherwise = unsafePrimToPrim act
-  where
-    n = MS.length planInput
-    m = MS.length planOutput
-
-    act :: IO ()
-    act = do
-            forM_ [0..n-1] $ \k -> unsafePrimToIO (UM.unsafeRead v k :: m a)
-                                    >>= MS.unsafeWrite planInput k
+    act :: v (PrimState m) a -> v (PrimState m) b -> IO ()
+    act vIn vOut = do
+            forM_ [0..n-1] $ \k -> unsafePrimToIO (M.unsafeRead vIn k :: m a)
+                                    >>= M.unsafeWrite planInput k
             unsafePrimToPrim planExecute
-            forM_ [0..n-1] $ \k -> MS.unsafeRead planOutput k
-                                    >>= unsafePrimToIO . (UM.unsafeWrite v k
-                                                            :: a -> m ())
+            forM_ [0..n-1] $ \k -> M.unsafeRead planOutput k
+                                    >>= unsafePrimToIO . (M.unsafeWrite vOut k
+                                                            :: b -> m ())
+{-# INLINE executeM #-}
 
 
 -----------------------
 -- Planners: methods of plan creation.
 
+-- | A transform which may be applied to vectors of different sizes.
 data Planner a b = Planner {
                         inputSize :: Int -> Int,
                         outputSize :: Int -> Int,
@@ -143,8 +158,7 @@ data Planner a b = Planner {
                         normalization :: Int -> Plan a b -> Plan a b
                     }
 
-
-{-# INLINE planOfType #-}
+-- | Create a 'Plan' of a specific size for this transform.
 planOfType :: (Storable a, Storable b) => PlanType
                                 -> Planner a b -> Int -> Plan a b
 planOfType ptype Planner{..} n
@@ -164,16 +178,21 @@ planOfType ptype Planner{..} n
   where
     m_in = inputSize n
     m_out = outputSize n
+{-# INLINE planOfType #-}
 
+-- | Create a 'Plan' of a specific size.  This function is equivalent to
+-- @'planOfType' 'Estimate'@.
 plan :: (Storable a, Storable b) => Planner a b -> Int -> Plan a b
 plan = planOfType Estimate
+{-# INLINE plan #-}
 
-{-# INLINE run #-}
-run :: (Storable a, Storable b, U.Unbox a, U.Unbox b)
-            => Planner a b -> U.Vector a -> U.Vector b
-run p v = execute
+-- | Create and run the 'Plan' for a given transform.
+run :: (Vector v a, Vector v b, Storable a, Storable b)
+            => Planner a b -> v a -> v b
+run p = \v -> execute
             (planOfType Estimate p $ creationSizeFromInput p $ V.length v)
             v
+{-# INLINE run #-}
 
 ---------------------------
 -- For scaling input/output:
