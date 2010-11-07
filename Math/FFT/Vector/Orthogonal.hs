@@ -1,3 +1,15 @@
+{- |
+This module provides normalized versions of the transforms in @fftw@.
+
+All of the transforms are normalized so that
+
+ - Each transform is orthogonal, i.e., preserves the sum-of-squares norm of its input.
+
+ - Each backwards transform is the inverse of the corresponding forwards transform.
+
+(Both conditions only hold approximately, due to floating point precision.)
+
+-}
 module Math.FFT.Vector.Orthogonal(
                 -- * Creating and executing 'Plan's
                 run,
@@ -10,6 +22,7 @@ module Math.FFT.Vector.Orthogonal(
                 dftR2C,
                 dftC2R,
                 -- * Discrete cosine transforms
+                -- $dct_inv
                 dct2,
                 dct3,
                 dct4,
@@ -49,6 +62,10 @@ complexR2CScaling !t !n !a = do
         else do
             unsafeModify a (len-1) $ scaleByD s1
             multC s2 (MS.unsafeSlice 1 (len-2) a)
+
+{- $dct_inv
+Note that 'dct4' is its own inverse, whereas 'dct2' and 'dct3' are inverses of each other.
+-}
 
 dct4 :: Planner Double Double
 dct4 = U.dct4 {normalization = \n -> constMultOutput $ 1 / sqrt (2 * toEnum n)}

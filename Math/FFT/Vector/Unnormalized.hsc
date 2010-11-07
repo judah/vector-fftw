@@ -1,4 +1,9 @@
--- | Unnormalized versions of the transforms.  This is faster but may cause math problems.
+{- |
+Raw, unnormalized versions of the transforms in @fftw@.
+
+Note that the forwards and backwards transforms of this module are not actually
+inverses.  For example, @run idft (run dft v) /= v@ in general.
+-}
 module Math.FFT.Vector.Unnormalized(
                     -- * Creating and executing 'Plan's
                     run,

@@ -1,3 +1,10 @@
+{- |
+This module provides normalized versions of the transforms in @fftw@.
+
+The forwards transforms in this module are identical to those in "Math.FFT.Vector.Unnormalized".
+The backwards transforms are normalized to be their inverse operations (approximately, due to floating point precision).
+
+-}
 module Math.FFT.Vector.Invertible(
                     -- * Creating and executing 'Plan's
                     run,
