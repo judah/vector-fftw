@@ -1,8 +1,6 @@
 Name:                vector-fftw
 
 Version:             0.1
-Synopsis:            TODO
-Description:         TODO
 License:             BSD3
 License-file:        LICENSE
 Author:              Judah Jacobson
@@ -11,6 +9,20 @@ Copyright:           (c) Judah Jacobson, 2010
 Category:            Math
 Build-type:          Simple
 Cabal-version:       >=1.2
+Synopsis:            A binding to the fftw library for one-dimensional vectors.
+Description:         This package provides bindings to the fftw library for one-dimensional vectors.
+                     It provides both high-level functions and more low-level manipulation of fftw plans.
+                     .
+                     We provide three different modules which wrap fftw's operations:
+                     .
+                      - "Math.FFT.Vector.Unnormalized" contains the raw transforms;
+                     . 
+                      - "Math.FFT.Vector.Invertible" scales the backwards transforms to be true inverses;
+                     .
+                      - "Math.FFT.Vector.Orthogonal" additionally scales all transforms to preserve the L2 (sum-of-squares) norm of the
+                        input.
+                     .
+                     Note that this package is currently not thread-safe.
 
 
 Library
