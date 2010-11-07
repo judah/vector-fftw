@@ -80,8 +80,8 @@ newPlan = fmap CPlan . newForeignPtr fftw_destroy_plan
 -- vector-fftw plans
 
 data Plan a b = Plan {
-                    planInput :: !(VS.MVector RealWorld a),
-                    planOutput :: !(VS.MVector RealWorld b),
+                    planInput :: {-# UNPACK #-} !(VS.MVector RealWorld a),
+                    planOutput :: {-# UNPACK #-} !(VS.MVector RealWorld b),
                     planExecute :: IO ()
                 }
 
