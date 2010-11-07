@@ -18,7 +18,9 @@ module Math.FFT.Vector.Invertible(
                     -- * Real-to-complex transforms
                     U.dftR2C,
                     dftC2R,
-                    -- * Discrete cosine transforms
+                    -- * Real-to-real transforms
+                    -- $dct_size
+                    -- ** Discrete cosine transforms
                     U.dct1,
                     idct1,
                     U.dct2,
@@ -27,7 +29,7 @@ module Math.FFT.Vector.Invertible(
                     idct3,
                     U.dct4,
                     idct4,
-                    -- * Discrete sine transforms
+                    -- ** Discrete sine transforms
                     U.dst1,
                     idst1,
                     U.dst2,
@@ -52,6 +54,11 @@ dftC2R :: Planner (Complex Double) Double
 dftC2R = U.dftC2R {normalization = \n -> constMultOutput $ 1 / toEnum n}
 
 -- OK, the inverse of each unnormalized operation.
+
+-- $dct_size
+-- The real-even (DCT) and real-odd (DST) transforms.  The input and output sizes
+-- are the same (@n@).
+
 
 -- | A type-1 discrete cosine transform which is the inverse of 'U.dct1'.
 --

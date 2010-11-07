@@ -24,6 +24,7 @@ module Math.FFT.Vector.Orthogonal(
                 dftR2C,
                 dftC2R,
                 -- * Discrete cosine transforms
+                -- $dct_size
                 dct2,
                 dct3,
                 dct4,
@@ -71,6 +72,12 @@ complexR2CScaling !t !n !a = do
         else do
             unsafeModify a (len-1) $ scaleByD s1
             multC s2 (MS.unsafeSlice 1 (len-2) a)
+
+
+-- $dct_size
+-- Some normalized real-even (DCT).  The input and output sizes
+-- are the same (@n@).
+
 
 -- | A type-4 discrete cosine transform.  It is its own inverse.
 -- 
