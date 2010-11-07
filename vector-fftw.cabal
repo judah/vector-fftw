@@ -32,7 +32,3 @@ Library
   ghc-options: -Wall
 
   Ghc-Options: -O2
-
-  -- XXX MacPorts-only
-  include-dirs: /opt/local/include
-  Extra-lib-dirs: /opt/local/lib
