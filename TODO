@@ -1,11 +1,9 @@
  - Thread safety of plan creation and execution (TODO: what guarantees do we
    have from FFTW?).
+ - Bench and optimize the normalized transforms.
  - Explicit versions in build-depends.
- - Remove the /opt/local additions.
- - Generalize to all types from Data.Vector.Generic?
  - Maybe better to have normalizeInput/output :: Vector -> Vector?
  - Rest of the orthonormal transforms.
- - Call Orthonormal.dct3 really idct2?
  - Tests that I'm using all of vector's unsafe ops correctly.
  - Tests for Unnormalized, that <Fu,v>==<u,F^*v>.
  - Can we get more accuracy wrt normalizations?
@@ -22,4 +20,5 @@
    - Bench normalizations
    - Put Plans in a list and apply them separately (to prevent unboxing), and
      see how much of a performance hit it is.
-
+ - QuickCheck properties matching each of the transforms against their (slow)
+   mathematical definition.
