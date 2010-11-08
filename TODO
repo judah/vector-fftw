@@ -1,5 +1,6 @@
  - Thread safety of plan creation and execution (TODO: what guarantees do we
    have from FFTW?).
+ - Figure out why TimeFFTW.hs and time-fftw.c don't match up in timings.
  - Better docs for c2r/r2c in all modules.
  - Multidimensional transforms.
  - Bench and optimize the normalized transforms.
