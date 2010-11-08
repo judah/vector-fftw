@@ -32,7 +32,7 @@ import Data.List as L
 import Control.Monad.Primitive (RealWorld,PrimMonad(..),
             unsafePrimToPrim, unsafePrimToIO)
 import Control.Monad(forM_)
-import Foreign (Storable, Ptr, unsafePerformIO, FunPtr,
+import Foreign (Storable(..), Ptr, unsafePerformIO, FunPtr,
                 ForeignPtr, withForeignPtr, newForeignPtr)
 import Foreign.C (CInt, CUInt)
 import Data.Bits ( (.&.) )
@@ -148,6 +148,19 @@ executeM Plan{..} = \vIn vOut ->
                                                             :: b -> m ())
 {-# INLINE executeM #-}
 
+------------------
+-- Malloc/free of fftw array
+
+foreign import ccall unsafe fftw_malloc :: CInt -> IO (Ptr a)
+foreign import ccall "&" fftw_free :: FunPtr (Ptr a -> IO ())
+
+newFFTVector :: forall a . Storable a => Int -> IO (MS.MVector RealWorld a)
+newFFTVector n = do
+    p <- fftw_malloc $ toEnum $ n * sizeOf (undefined :: a)
+    fp <- newForeignPtr fftw_free p
+    return $ MS.MVector p n fp
+{-# INLINE newFFTVector #-}
+
 
 -----------------------
 -- Transforms: methods of plan creation.
@@ -167,8 +180,8 @@ planOfType :: (Storable a, Storable b) => PlanType
 planOfType ptype Transform{..} n
   | m_in <= 0 || m_out <= 0 = error "Can't (yet) plan for empty arrays!"
   | otherwise  = unsafePerformIO $ do
-    planInput <- MS.unsafeNew m_in
-    planOutput <- MS.unsafeNew m_out
+    planInput <- newFFTVector m_in
+    planOutput <- newFFTVector m_out
     MS.unsafeWith planInput $ \inP -> MS.unsafeWith planOutput $ \outP -> do
     pPlan <- makePlan (toEnum n) inP outP $ planInitFlags ptype DestroyInput
     cPlan <- newPlan pPlan
