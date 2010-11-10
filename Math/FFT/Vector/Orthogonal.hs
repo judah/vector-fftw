@@ -26,7 +26,7 @@ module Math.FFT.Vector.Orthogonal(
                 -- * Discrete cosine transforms
                 -- $dct_size
                 dct2,
-                dct3,
+                idct2,
                 dct4,
                 ) where
 
@@ -111,13 +111,13 @@ dct2 = U.dct2 {normalization = \n -> modifyOutput $ \a -> do
     multC s2 (MS.unsafeSlice 1 (MS.length a-1) a)
     }
 
--- | A type-3 discrete cosine transform.  Its inverse is 'dct2'.
+-- | A type-3 discrete cosine transform which is the inverse of 'dct2'.
 --
 -- @y_k = (-1)^k w(n-1) x_(n-1) + 2 sum_(j=0)^(n-2) w(j) x_j sin(pi(j+1)(k+1\/2)/n);@
 -- where
 -- @w(0)=1\/sqrt(n)@, and @w(k)=1/sqrt(2n)@ for @k>0@.
-dct3 :: Transform Double Double
-dct3 = U.dct3 {normalization = \n -> modifyInput $ \a -> do
+idct2 :: Transform Double Double
+idct2 = U.dct3 {normalization = \n -> modifyInput $ \a -> do
     let n' = toEnum n
     let !s1 = sqrt $ 1 / n'
     let !s2 = sqrt $ 1 / (2*n')

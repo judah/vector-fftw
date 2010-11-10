@@ -1,7 +1,11 @@
  - Thread safety of plan creation and execution (TODO: what guarantees do we
    have from FFTW?).
+ - Better docs for why plans are useful.
+ - Mention that dct2 is "the" DCT.
  - Figure out why TimeFFTW.hs and time-fftw.c don't match up in timings.
  - Better docs for c2r/r2c in all modules.
+   Specifically, note that it's orthog/invert only when first and last are real (I
+   think?)
  - Multidimensional transforms.
  - Bench and optimize the normalized transforms.
  - Explicit versions in build-depends.
