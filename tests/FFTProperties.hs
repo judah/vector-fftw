@@ -66,7 +66,7 @@ instance Mag (Complex Double) where
 close :: Mag a => a -> a -> Bool
 close x y = tol > mag (x-y) / max 1 (mag x + mag y)
   where
-    tol = 1e-11
+    tol = 1e-10
 
 withinTol :: (Mag a, V.Unbox a) => V.Vector a -> V.Vector a -> Bool
 withinTol a b
