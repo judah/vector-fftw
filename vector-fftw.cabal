@@ -19,7 +19,7 @@ Description:         This package provides bindings to the fftw library for one-
                      . 
                       - "Math.FFT.Vector.Invertible" scales the backwards transforms to be true inverses;
                      .
-                      - "Math.FFT.Vector.Orthogonal" additionally scales all transforms to preserve the L2 (sum-of-squares) norm of the
+                      - "Math.FFT.Vector.Unitary" additionally scales all transforms to preserve the L2 (sum-of-squares) norm of the
                         input.
                      .
                      Note that this package is currently not thread-safe.
@@ -29,7 +29,7 @@ Library
   Exposed-modules:     
         Math.FFT.Vector.Unnormalized
         Math.FFT.Vector.Invertible
-        Math.FFT.Vector.Orthogonal
+        Math.FFT.Vector.Unitary
         Math.FFT.Vector.Plan
 
   Other-modules:

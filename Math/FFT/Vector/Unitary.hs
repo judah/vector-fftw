@@ -3,7 +3,7 @@ This module provides normalized versions of the transforms in @fftw@.
 
 All of the transforms are normalized so that
 
- - Each transform is orthogonal, i.e., preserves the sum-of-squares norm of its input.
+ - Each transform is unitary, i.e., preserves the inner product and the sum-of-squares norm of its input.
 
  - Each backwards transform is the inverse of the corresponding forwards transform.
 
@@ -12,7 +12,7 @@ All of the transforms are normalized so that
 For more information on the underlying transforms, see
 <http://www.fftw.org/fftw3_doc/What-FFTW-Really-Computes.html>.
 -}
-module Math.FFT.Vector.Orthogonal(
+module Math.FFT.Vector.Unitary(
                 -- * Creating and executing 'Plan's
                 run,
                 plan,

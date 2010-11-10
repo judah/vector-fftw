@@ -10,7 +10,7 @@ import Test.Framework.Providers.QuickCheck2 (testProperty)
 import Test.QuickCheck
 
 import qualified Math.FFT.Vector.Invertible as I
-import qualified Math.FFT.Vector.Orthogonal as O
+import qualified Math.FFT.Vector.Unitary as U
 import Math.FFT.Vector.Plan
 
 main = defaultMain
@@ -28,18 +28,18 @@ main = defaultMain
               , testProperty "I.dst2" $ prop_invert I.dst2 I.idst2
               , testProperty "I.dst3" $ prop_invert I.dst3 I.idst3
               , testProperty "I.dst4" $ prop_invert I.dst4 I.idst4
-              , testProperty "O.dft" $ prop_invert O.dft O.idft
-              , testProperty "O.dftR2C" $ prop_invert O.dftR2C O.dftC2R
-              , testProperty "O.dct2" $ prop_invert O.dct2 O.dct3
+              , testProperty "U.dft" $ prop_invert U.dft U.idft
+              , testProperty "U.dftR2C" $ prop_invert U.dftR2C U.dftC2R
+              , testProperty "U.dct2" $ prop_invert U.dct2 U.idct2
               ]
             , testGroup "orthogonality"
-              [ testProperty "O.dft" $ prop_orthog O.dft
-              , testProperty "O.idft" $ prop_orthog O.idft
-              , testProperty "O.dftR2C" $ prop_orthog O.dftR2C
-              , testProperty "O.dftC2R" $ prop_orthog O.dftR2C
-              , testProperty "O.dct2" $ prop_orthog O.dct2
-              , testProperty "O.dct3" $ prop_orthog O.dct3
-              , testProperty "O.dct4" $ prop_orthog O.dct4
+              [ testProperty "U.dft" $ prop_orthog U.dft
+              , testProperty "U.idft" $ prop_orthog U.idft
+              , testProperty "U.dftR2C" $ prop_orthog U.dftR2C
+              , testProperty "U.dftC2R" $ prop_orthog U.dftR2C
+              , testProperty "U.dct2" $ prop_orthog U.dct2
+              , testProperty "U.idct2" $ prop_orthog U.idct2
+              , testProperty "U.dct4" $ prop_orthog U.dct4
               ]
             ]
 
