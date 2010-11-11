@@ -1,4 +1,4 @@
-module Math.FFT.Vector.Plan(
+module Numeric.FFT.Vector.Plan(
                 -- * Transform
                 Transform(),
                 planOfType,
@@ -13,4 +13,4 @@ module Math.FFT.Vector.Plan(
                 executeM,
                 ) where
 
-import Math.FFT.Vector.Base
+import Numeric.FFT.Vector.Base

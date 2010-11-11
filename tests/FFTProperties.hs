@@ -9,9 +9,9 @@ import Test.Framework (defaultMain, testGroup)
 import Test.Framework.Providers.QuickCheck2 (testProperty)
 import Test.QuickCheck
 
-import qualified Math.FFT.Vector.Invertible as I
-import qualified Math.FFT.Vector.Unitary as U
-import Math.FFT.Vector.Plan
+import qualified Numeric.FFT.Vector.Invertible as I
+import qualified Numeric.FFT.Vector.Unitary as U
+import Numeric.FFT.Vector.Plan
 
 main = defaultMain
             -- NB: There's no explicit tests for the Unnormalized package.

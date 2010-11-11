@@ -12,7 +12,7 @@ All of the transforms are normalized so that
 For more information on the underlying transforms, see
 <http://www.fftw.org/fftw3_doc/What-FFTW-Really-Computes.html>.
 -}
-module Math.FFT.Vector.Unitary(
+module Numeric.FFT.Vector.Unitary(
                 -- * Creating and executing 'Plan's
                 run,
                 plan,
@@ -30,8 +30,8 @@ module Math.FFT.Vector.Unitary(
                 dct4,
                 ) where
 
-import Math.FFT.Vector.Base
-import qualified Math.FFT.Vector.Unnormalized as U
+import Numeric.FFT.Vector.Base
+import qualified Numeric.FFT.Vector.Unnormalized as U
 import Data.Complex
 import qualified Data.Vector.Storable.Mutable as MS
 import Control.Monad.Primitive(RealWorld)

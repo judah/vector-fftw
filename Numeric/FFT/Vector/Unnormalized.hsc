@@ -7,7 +7,7 @@ inverses.  For example, @run idft (run dft v) /= v@ in general.
 For more information on the individual transforms, see
 <http://www.fftw.org/fftw3_doc/What-FFTW-Really-Computes.html>.
 -}
-module Math.FFT.Vector.Unnormalized(
+module Numeric.FFT.Vector.Unnormalized(
                     -- * Creating and executing 'Plan's
                     run,
                     plan,
@@ -32,7 +32,7 @@ module Math.FFT.Vector.Unnormalized(
                     dst4,
                     ) where
 
-import Math.FFT.Vector.Base
+import Numeric.FFT.Vector.Base
 import Foreign
 import Foreign.C
 import Data.Complex

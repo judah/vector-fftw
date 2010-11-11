@@ -1,5 +1,5 @@
 -- | A basic interface between Vectors and the fftw library.
-module Math.FFT.Vector.Base(
+module Numeric.FFT.Vector.Base(
             -- * Transforms
             Transform(..),
             planOfType,

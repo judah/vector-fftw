@@ -1,9 +1,9 @@
 module Main (main) where
 
 import Data.Vector.Storable as V
-import Math.FFT.Vector.Unnormalized as U
-import Math.FFT.Vector.Invertible as I
-import Math.FFT.Vector.Orthogonal as O
+import Numeric.FFT.Vector.Unnormalized as U
+import Numeric.FFT.Vector.Invertible as I
+import Numeric.FFT.Vector.Unitary as O
 import Criterion.Main
 import Data.Complex
 

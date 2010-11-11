@@ -1,13 +1,13 @@
 {- |
 This module provides normalized versions of the transforms in @fftw@.
 
-The forwards transforms in this module are identical to those in "Math.FFT.Vector.Unnormalized".
+The forwards transforms in this module are identical to those in "Numeric.FFT.Vector.Unnormalized".
 The backwards transforms are normalized to be their inverse operations (approximately, due to floating point precision).
 
 For more information on the underlying transforms, see
 <http://www.fftw.org/fftw3_doc/What-FFTW-Really-Computes.html>.
 -}
-module Math.FFT.Vector.Invertible(
+module Numeric.FFT.Vector.Invertible(
                     -- * Creating and executing 'Plan's
                     run,
                     plan,
@@ -40,8 +40,8 @@ module Math.FFT.Vector.Invertible(
                     idst4,
                     ) where
 
-import Math.FFT.Vector.Base
-import qualified Math.FFT.Vector.Unnormalized as U
+import Numeric.FFT.Vector.Base
+import qualified Numeric.FFT.Vector.Unnormalized as U
 import Data.Complex
 
 -- | A backward discrete Fourier transform which is the inverse of 'U.dft'.  The output and input sizes are the same (@n@).
