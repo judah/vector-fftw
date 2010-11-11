@@ -8,7 +8,7 @@ Maintainer:          Judah Jacobson <judah.jacobson@gmail.com>
 Copyright:           (c) Judah Jacobson, 2010
 Category:            Math
 Build-type:          Simple
-Cabal-version:       >=1.2
+Cabal-version:       >=1.6
 Synopsis:            A binding to the fftw library for one-dimensional vectors.
 Description:         This package provides bindings to the fftw library for one-dimensional vectors.
                      It provides both high-level functions and more low-level manipulation of fftw plans.
