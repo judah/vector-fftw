@@ -215,7 +215,6 @@ run p = \v -> execute
 
 class Scalable a where
     scaleByD :: Double -> a -> a
-    {-# INLINE scaleByD #-}
 
 instance Scalable Double where
     scaleByD = (*)
