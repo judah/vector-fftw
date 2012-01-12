@@ -158,7 +158,7 @@ newFFTVector :: forall a . Storable a => Int -> IO (MS.MVector RealWorld a)
 newFFTVector n = do
     p <- fftw_malloc $ toEnum $ n * sizeOf (undefined :: a)
     fp <- newForeignPtr fftw_free p
-    return $ MS.MVector p n fp
+    return $ MS.MVector n fp
 {-# INLINE newFFTVector #-}
 
 
