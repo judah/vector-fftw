@@ -1,3 +1,4 @@
+// Build with:  gcc time-fftw.c -std=c99 -lfftw3
 #include <complex.h>
 #include <fftw3.h>
 #include <math.h>
