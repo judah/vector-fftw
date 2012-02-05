@@ -1,9 +1,10 @@
+{-# LANGUAGE BangPatterns #-}
 module Main where
 
 import Data.Vector.Storable as V
 import Data.Vector.Storable.Mutable as M
-import Math.FFT.Vector.Unnormalized as U
-import Math.FFT.Vector.Plan
+import Numeric.FFT.Vector.Unnormalized as U
+import Numeric.FFT.Vector.Plan
 import Data.Numskell.Vector as N
 import Criterion.Main
 import Data.Complex
