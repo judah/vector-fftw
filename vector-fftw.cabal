@@ -9,6 +9,7 @@ Copyright:           (c) Judah Jacobson, 2010
 Category:            Math
 Build-type:          Simple
 Cabal-version:       >=1.6
+Homepage:            http://hackage.haskell.org/package/vector-fftw
 Synopsis:            A binding to the fftw library for one-dimensional vectors.
 Description:         This package provides bindings to the fftw library for one-dimensional vectors.
                      It provides both high-level functions and more low-level manipulation of fftw plans.
@@ -23,6 +24,10 @@ Description:         This package provides bindings to the fftw library for one-
                         input.
                      .
                      Note that this package is currently not thread-safe.
+
+source-repository head
+    type:   git
+    location: https://github.com/judah/vector-fftw
 
 
 Library
