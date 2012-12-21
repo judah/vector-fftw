@@ -34,7 +34,7 @@ import Control.Monad.Primitive (RealWorld,PrimMonad(..),
 import Control.Monad(forM_)
 import Foreign (Storable(..), Ptr, unsafePerformIO, FunPtr,
                 ForeignPtr, withForeignPtr, newForeignPtr)
-import Foreign.C (CInt, CUInt)
+import Foreign.C (CInt(..), CUInt)
 import Data.Bits ( (.&.) )
 import Data.Complex(Complex(..))
 import Foreign.Storable.Complex()
