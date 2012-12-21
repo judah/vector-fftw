@@ -32,12 +32,13 @@ import Data.List as L
 import Control.Monad.Primitive (RealWorld,PrimMonad(..),
             unsafePrimToPrim, unsafePrimToIO)
 import Control.Monad(forM_)
-import Foreign (Storable(..), Ptr, unsafePerformIO, FunPtr,
+import Foreign (Storable(..), Ptr, FunPtr,
                 ForeignPtr, withForeignPtr, newForeignPtr)
 import Foreign.C (CInt(..), CUInt)
 import Data.Bits ( (.&.) )
 import Data.Complex(Complex(..))
 import Foreign.Storable.Complex()
+import System.IO.Unsafe (unsafePerformIO)
 
 
 
