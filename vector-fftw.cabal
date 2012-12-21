@@ -1,6 +1,6 @@
 Name:                vector-fftw
 
-Version:             0.1.2
+Version:             0.1.3
 License:             BSD3
 License-file:        LICENSE
 Author:              Judah Jacobson
@@ -40,8 +40,8 @@ Library
   Other-modules:
         Numeric.FFT.Vector.Base
   
-  Build-depends: base>=4.3 && < 4.6, vector==0.9.*, primitive==0.4.*,
-                 storable-complex==0.2.*
+  Build-depends: base>=4.3 && < 5.0, vector>=0.9, primitive>=0.4,
+                 storable-complex>=0.2
   Extra-libraries: fftw3
 
   Extensions: ForeignFunctionInterface, RecordWildCards, BangPatterns, FlexibleInstances,

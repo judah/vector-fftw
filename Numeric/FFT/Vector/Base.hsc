@@ -38,6 +38,7 @@ import Foreign.C (CInt, CUInt)
 import Data.Bits ( (.&.) )
 import Data.Complex(Complex(..))
 import Foreign.Storable.Complex()
+import Foreign.C.Types (CInt(..))
 
 
 
@@ -98,7 +99,7 @@ planOutputSize = MS.length . planOutput
 --
 -- If @'planInputSize' p /= length v@, then calling
 -- @execute p v@ will throw an exception.
-execute :: (Vector v a, Vector v b, Storable a, Storable b) 
+execute :: (Vector v a, Vector v b, Storable a, Storable b)
             => Plan a b -> v a -> v b
 execute Plan{..} = \v -> -- fudge the arity to make sure it's always inlined
     if n /= V.length v
@@ -123,7 +124,7 @@ execute Plan{..} = \v -> -- fudge the arity to make sure it's always inlined
 --
 -- If @'planInputSize' p \/= length vIn@ or @'planOutputSize' p \/= length vOut@,
 -- then calling @unsafeExecuteM p vIn vOut@ will throw an exception.
-executeM :: forall m v a b . 
+executeM :: forall m v a b .
         (PrimMonad m, MVector v a, MVector v b, Storable a, Storable b)
             => Plan a b -- ^ The plan to run.
             -> v (PrimState m) a  -- ^ The input vector.
