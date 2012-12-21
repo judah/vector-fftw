@@ -68,13 +68,13 @@ dft1D d = Transform {
             }
 
 -- | A forward discrete Fourier transform.  The output and input sizes are the same (@n@).
--- 
+--
 -- @y_k = sum_(j=0)^(n-1) x_j e^(-2pi i j k/n)@
 dft :: Transform (Complex Double) (Complex Double)
 dft = dft1D (#const FFTW_FORWARD)
 
 -- | A backward discrete Fourier transform.  The output and input sizes are the same (@n@).
--- 
+--
 -- @y_k = sum_(j=0)^(n-1) x_j e^(2pi i j k/n)@
 idft :: Transform (Complex Double) (Complex Double)
 idft = dft1D (#const FFTW_BACKWARD)
@@ -93,7 +93,7 @@ dftR2C = Transform {
 -- | A backward discrete Fourier transform which produces real data.
 --
 -- This 'Transform' behaves differently than the others:
---  
+--
 --  - Calling @plan dftC2R n@ creates a 'Plan' whose /output/ size is @n@, and whose
 --    /input/ size is @n \`div\` 2 + 1@.
 --
@@ -120,43 +120,43 @@ r2rTransform kind = Transform {
 -- The real-even (DCT) and real-odd (DST) transforms.  The input and output sizes
 -- are the same (@n@).
 
--- | A type-1 discrete cosine transform.  
+-- | A type-1 discrete cosine transform.
 --
 -- @y_k = x_0 + (-1)^k x_(n-1) + 2 sum_(j=1)^(n-2) x_j cos(pi j k\/(n-1))@
 dct1 :: Transform Double Double
 dct1 = r2rTransform (#const  FFTW_REDFT00)
 
--- | A type-2 discrete cosine transform.  
+-- | A type-2 discrete cosine transform.
 --
 -- @y_k = 2 sum_(j=0)^(n-1) x_j cos(pi(j+1\/2)k\/n)@
 dct2 :: Transform Double Double
 dct2 = r2rTransform (#const  FFTW_REDFT10)
 
--- | A type-3 discrete cosine transform.  
+-- | A type-3 discrete cosine transform.
 --
 -- @y_k = x_0 + 2 sum_(j=1)^(n-1) x_j cos(pi j(k+1\/2)\/n)@
 dct3 :: Transform Double Double
 dct3 = r2rTransform (#const  FFTW_REDFT01)
 
--- | A type-4 discrete cosine transform.  
+-- | A type-4 discrete cosine transform.
 --
 -- @y_k = 2 sum_(j=0)^(n-1) x_j cos(pi(j+1\/2)(k+1\/2)\/n)@
 dct4 :: Transform Double Double
 dct4 = r2rTransform (#const  FFTW_REDFT11)
 
 -- | A type-1 discrete sine transform.
--- 
+--
 -- @y_k = 2 sum_(j=0)^(n-1) x_j sin(pi(j+1)(k+1)\/(n+1))@
 dst1 :: Transform Double Double
 dst1 = r2rTransform (#const  FFTW_RODFT00)
 
 -- | A type-2 discrete sine transform.
--- 
+--
 -- @y_k = 2 sum_(j=0)^(n-1) x_j sin(pi(j+1\/2)(k+1)\/n)@
 dst2 :: Transform Double Double
 dst2 = r2rTransform (#const  FFTW_RODFT10)
 
--- | A type-3 discrete sine transform.  
+-- | A type-3 discrete sine transform.
 --
 -- @y_k = (-1)^k x_(n-1) + 2 sum_(j=0)^(n-2) x_j sin(pi(j+1)(k+1\/2)/n)@
 dst3 :: Transform Double Double

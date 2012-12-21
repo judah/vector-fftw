@@ -45,7 +45,7 @@ import qualified Numeric.FFT.Vector.Unnormalized as U
 import Data.Complex
 
 -- | A backward discrete Fourier transform which is the inverse of 'U.dft'.  The output and input sizes are the same (@n@).
--- 
+--
 -- @y_k = (1\/n) sum_(j=0)^(n-1) x_j e^(2pi i j k/n)@
 idft :: Transform (Complex Double) (Complex Double)
 idft = U.idft {normalization = \n -> constMultOutput $ 1 / toEnum n}
@@ -54,7 +54,7 @@ idft = U.idft {normalization = \n -> constMultOutput $ 1 / toEnum n}
 -- 'U.dftR2C'.  (Specifically, @run dftC2R . run dftR2C == id@.)
 --
 -- This 'Transform' behaves differently than the others:
---  
+--
 --  - Calling @plan dftC2R n@ creates a 'Plan' whose /output/ size is @n@, and whose
 --    /input/ size is @n \`div\` 2 + 1@.
 --
@@ -77,13 +77,13 @@ idct1 :: Transform Double Double
 idct1 = U.dct1 {normalization = \n -> constMultOutput $ 1 / toEnum (2 * (n-1))}
 
 -- | A type-3 discrete cosine transform which is the inverse of 'U.dct2'.
--- 
+--
 -- @y_k = (1\/(2n)) [x_0 + 2 sum_(j=1)^(n-1) x_j cos(pi j(k+1\/2)\/n)]@
 idct2 :: Transform Double Double
 idct2 = U.dct3 {normalization = \n -> constMultOutput $ 1 / toEnum (2 * n)}
 
 -- | A type-2 discrete cosine transform which is the inverse of 'U.dct3'.
--- 
+--
 -- @y_k = (1\/n) sum_(j=0)^(n-1) x_j cos(pi(j+1\/2)k\/n)@
 idct3 :: Transform Double Double
 idct3 = U.dct2 {normalization = \n -> constMultOutput $ 1 / toEnum (2 * n)}

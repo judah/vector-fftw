@@ -43,7 +43,7 @@ dft :: Transform (Complex Double) (Complex Double)
 dft = U.dft {normalization = \n -> constMultOutput $ 1 / sqrt (toEnum n)}
 
 -- | An inverse discrete Fourier transform.  The output and input sizes are the same (@n@).
--- 
+--
 -- @y_k = (1\/sqrt n) sum_(j=0)^(n-1) x_j e^(2pi i j k\/n)@
 idft :: Transform (Complex Double) (Complex Double)
 idft = U.idft {normalization = \n -> constMultOutput $ 1 / sqrt (toEnum n)}
@@ -59,7 +59,7 @@ dftR2C = U.dftR2C {normalization = \n -> modifyOutput $
 -- 'U.dftR2C'.  (Specifically, @run dftC2R . run dftR2C == id@.)
 --
 -- This 'Transform' behaves differently than the others:
---  
+--
 --  - Calling @plan dftC2R n@ creates a 'Plan' whose /output/ size is @n@, and whose
 --    /input/ size is @n \`div\` 2 + 1@.
 --
@@ -92,7 +92,7 @@ complexR2CScaling !t !n !a = do
 
 
 -- | A type-4 discrete cosine transform.  It is its own inverse.
--- 
+--
 -- @y_k = (1\/sqrt n) sum_(j=0)^(n-1) x_j cos(pi(j+1\/2)(k+1\/2)\/n)@
 dct4 :: Transform Double Double
 dct4 = U.dct4 {normalization = \n -> constMultOutput $ 1 / sqrt (2 * toEnum n)}
