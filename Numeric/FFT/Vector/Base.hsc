@@ -29,7 +29,7 @@ import qualified Data.Vector.Storable.Mutable as MS
 import Data.Vector.Generic as V hiding (forM_)
 import Data.Vector.Generic.Mutable as M
 import Data.List as L
-import Control.Monad.Primitive (RealWorld,PrimMonad(..),
+import Control.Monad.Primitive (RealWorld,PrimMonad(..), PrimBase,
             unsafePrimToPrim, unsafePrimToIO)
 import Control.Monad(forM_)
 import Foreign (Storable(..), Ptr, FunPtr,
@@ -125,7 +125,7 @@ execute Plan{..} = \v -> -- fudge the arity to make sure it's always inlined
 -- If @'planInputSize' p \/= length vIn@ or @'planOutputSize' p \/= length vOut@,
 -- then calling @unsafeExecuteM p vIn vOut@ will throw an exception.
 executeM :: forall m v a b .
-        (PrimMonad m, MVector v a, MVector v b, Storable a, Storable b)
+        (PrimBase m, MVector v a, MVector v b, Storable a, Storable b)
             => Plan a b -- ^ The plan to run.
             -> v (PrimState m) a  -- ^ The input vector.
                     -> v (PrimState m) b -- ^ The output vector.
