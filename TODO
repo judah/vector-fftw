@@ -1,5 +1,3 @@
- - Thread safety of plan creation and execution (TODO: what guarantees do we
-   have from FFTW?).
  - Better docs for why plans are useful.
  - Mention that dct2 is "the" DCT.
  - Figure out why TimeFFTW.hs and time-fftw.c don't match up in timings.
