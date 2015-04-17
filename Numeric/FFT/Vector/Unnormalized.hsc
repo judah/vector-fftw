@@ -63,7 +63,7 @@ dft1D d = Transform {
             inputSize = id,
             outputSize = id,
             creationSizeFromInput = id,
-            makePlan = \n a b -> fftw_plan_dft_1d n a b d,
+            makePlan = \n a b -> withPlanner . fftw_plan_dft_1d n a b d,
             normalization = const id
             }
 
@@ -86,7 +86,7 @@ dftR2C = Transform {
             inputSize = id,
             outputSize = \n -> n `div` 2 + 1,
             creationSizeFromInput = id,
-            makePlan = fftw_plan_dft_r2c_1d,
+            makePlan = \n a b -> withPlanner . fftw_plan_dft_r2c_1d n a b,
             normalization = const id
         }
 
@@ -103,7 +103,7 @@ dftC2R = Transform {
             inputSize = \n -> n `div` 2 + 1,
             outputSize = id,
             creationSizeFromInput = \n -> 2 * (n-1),
-            makePlan = fftw_plan_dft_c2r_1d,
+            makePlan = \n a b -> withPlanner . fftw_plan_dft_c2r_1d n a b,
             normalization = const id
         }
 
@@ -112,7 +112,7 @@ r2rTransform kind = Transform {
                     inputSize = id,
                     outputSize = id,
                     creationSizeFromInput = id,
-                    makePlan = \n a b -> fftw_plan_r2r_1d n a b kind,
+                    makePlan = \n a b -> withPlanner . fftw_plan_r2r_1d n a b kind,
                     normalization = const id
                 }
 
