@@ -12,6 +12,7 @@ module Numeric.FFT.Vector.Base(
             planOutputSize,
             execute,
             executeM,
+            withPlanner,
             -- * Unsafe C stuff
             CFlags,
             CPlan,
@@ -27,9 +28,10 @@ module Numeric.FFT.Vector.Base(
 import qualified Data.Vector.Storable as VS
 import qualified Data.Vector.Storable.Mutable as MS
 import Data.Vector.Generic as V hiding (forM_)
-import Data.Vector.Generic.Mutable as M
+import Data.Vector.Generic.Mutable as M hiding (unsafeModify)
 import Data.List as L
-import Control.Monad.Primitive (RealWorld,PrimMonad(..),
+import Control.Concurrent.MVar
+import Control.Monad.Primitive (RealWorld,PrimMonad(..), PrimBase,
             unsafePrimToPrim, unsafePrimToIO)
 import Control.Monad(forM_)
 import Foreign (Storable(..), Ptr, FunPtr,
@@ -125,7 +127,7 @@ execute Plan{..} = \v -> -- fudge the arity to make sure it's always inlined
 -- If @'planInputSize' p \/= length vIn@ or @'planOutputSize' p \/= length vOut@,
 -- then calling @unsafeExecuteM p vIn vOut@ will throw an exception.
 executeM :: forall m v a b .
-        (PrimMonad m, MVector v a, MVector v b, Storable a, Storable b)
+        (PrimBase m, MVector v a, MVector v b, Storable a, Storable b)
             => Plan a b -- ^ The plan to run.
             -> v (PrimState m) a  -- ^ The input vector.
                     -> v (PrimState m) b -- ^ The output vector.
@@ -248,3 +250,16 @@ multC !s v = forM_ [0..n-1] $ \k -> unsafeModify v k (scaleByD s)
 unsafeModify :: (Storable a)
                 => MS.MVector RealWorld a -> Int -> (a -> a) -> IO ()
 unsafeModify v k f = MS.unsafeRead v k >>= MS.unsafeWrite v k . f
+
+plannerLock :: MVar ()
+plannerLock = unsafePerformIO $ newMVar ()
+{-# NOINLINE plannerLock #-}
+
+-- | Calls to the FFTW planner are non-reentrant. Here we take a mutex to
+-- ensure thread safety.
+withPlanner :: IO a -> IO a
+withPlanner action = do
+    takeMVar plannerLock
+    res <- action
+    putMVar plannerLock ()
+    return res
