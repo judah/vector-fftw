@@ -28,7 +28,7 @@ module Numeric.FFT.Vector.Base(
 import qualified Data.Vector.Storable as VS
 import qualified Data.Vector.Storable.Mutable as MS
 import Data.Vector.Generic as V hiding (forM_)
-import Data.Vector.Generic.Mutable as M
+import Data.Vector.Generic.Mutable as M hiding (unsafeModify)
 import Data.List as L
 import Control.Concurrent.MVar
 import Control.Monad.Primitive (RealWorld,PrimMonad(..), PrimBase,
