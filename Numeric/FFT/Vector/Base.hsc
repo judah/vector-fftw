@@ -37,7 +37,7 @@ import Control.Monad(forM_)
 import Foreign (Storable(..), Ptr, FunPtr,
                 ForeignPtr, withForeignPtr, newForeignPtr)
 import Foreign.C (CInt(..), CUInt)
-import Data.Bits ( (.&.) )
+import Data.Bits ( (.|.) )
 import Data.Complex(Complex(..))
 import Foreign.Storable.Complex()
 import System.IO.Unsafe (unsafePerformIO)
@@ -57,7 +57,7 @@ type CFlags = CUInt
 
 -- | Marshal the Transform flags for use by fftw.
 planInitFlags :: PlanType -> Preservation -> CFlags
-planInitFlags pt pr = planTypeInt .&. preservationInt
+planInitFlags pt pr = planTypeInt .|. preservationInt
   where
     planTypeInt = case pt of
                     Estimate -> #const FFTW_ESTIMATE
