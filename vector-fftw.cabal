@@ -42,7 +42,10 @@ Library
                  vector>=0.9 && < 0.12,
                  primitive>=0.6 && < 0.7,
                  storable-complex==0.2.*
-  Extra-libraries: fftw3
+  if os(windows)
+    Extra-libraries: fftw3-3
+  else
+    Extra-libraries: fftw3
 
   Extensions: ForeignFunctionInterface, RecordWildCards, BangPatterns, FlexibleInstances,
                 ScopedTypeVariables
