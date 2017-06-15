@@ -17,7 +17,7 @@ Description:         This package provides bindings to the fftw library for one-
                      We provide three different modules which wrap fftw's operations:
                      .
                       - "Numeric.FFT.Vector.Unnormalized" contains the raw transforms;
-                     . 
+                     .
                       - "Numeric.FFT.Vector.Invertible" scales the backwards transforms to be true inverses;
                      .
                       - "Numeric.FFT.Vector.Unitary" additionally scales all transforms to preserve the L2 (sum-of-squares) norm of the
@@ -30,7 +30,7 @@ source-repository head
 
 
 Library
-  Exposed-modules:     
+  Exposed-modules:
         Numeric.FFT.Vector.Unnormalized
         Numeric.FFT.Vector.Invertible
         Numeric.FFT.Vector.Unitary
@@ -38,9 +38,9 @@ Library
 
   Other-modules:
         Numeric.FFT.Vector.Base
-  
-  Build-depends: base>=4.3 && < 4.10,
-                 vector>=0.9 && < 0.12,
+
+  Build-depends: base>=4.3 && < 4.11,
+                 vector>=0.9 && < 0.13,
                  primitive>=0.6 && < 0.7,
                  storable-complex==0.2.*
   if os(windows)
