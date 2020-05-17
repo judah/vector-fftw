@@ -34,8 +34,11 @@ Library
   default-language: Haskell2010
   Exposed-modules:
         Numeric.FFT.Vector.Unnormalized
+        Numeric.FFT.Vector.Unnormalized.Multi
         Numeric.FFT.Vector.Invertible
+        Numeric.FFT.Vector.Invertible.Multi
         Numeric.FFT.Vector.Unitary
+        Numeric.FFT.Vector.Unitary.Multi
         Numeric.FFT.Vector.Plan
 
   Other-modules:

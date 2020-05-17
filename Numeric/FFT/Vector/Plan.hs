@@ -5,6 +5,10 @@ module Numeric.FFT.Vector.Plan(
                 PlanType(..),
                 plan,
                 run,
+                TransformND(),
+                planOfTypeND,
+                planND,
+                runND,
                 -- * Plans
                 Plan(),
                 planInputSize,
