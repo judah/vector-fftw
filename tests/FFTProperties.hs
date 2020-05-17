@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 -- This module uses the test-framework-quickcheck2 package.
 module Main where
