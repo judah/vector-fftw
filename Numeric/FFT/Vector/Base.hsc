@@ -191,14 +191,14 @@ planOfType ptype Transform{..} n
     planInput <- newFFTVector m_in
     planOutput <- newFFTVector m_out
     MS.unsafeWith planInput $ \inP -> MS.unsafeWith planOutput $ \outP -> do
-    pPlan <- makePlan (toEnum n) inP outP $ planInitFlags ptype DestroyInput
-    cPlan <- newPlan pPlan
-    -- Use unsafeWith here to ensure that the Storable MVectors' ForeignPtrs
-    -- aren't released too soon:
-    let planExecute = MS.unsafeWith planInput $ \_ ->
-                        MS.unsafeWith planOutput $ \_ ->
-                          withPlan cPlan fftw_execute
-    return $ normalization n $ Plan {..}
+        pPlan <- makePlan (toEnum n) inP outP $ planInitFlags ptype DestroyInput
+        cPlan <- newPlan pPlan
+        -- Use unsafeWith here to ensure that the Storable MVectors' ForeignPtrs
+        -- aren't released too soon:
+        let planExecute = MS.unsafeWith planInput $ \_ ->
+                            MS.unsafeWith planOutput $ \_ ->
+                                withPlan cPlan fftw_execute
+        return $ normalization n $ Plan {..}
   where
     m_in = inputSize n
     m_out = outputSize n
@@ -241,14 +241,14 @@ planOfTypeND ptype TransformND{..} dims
     planInput <- newFFTVector m_in
     planOutput <- newFFTVector m_out
     MS.unsafeWith mdims $ \dimsP -> MS.unsafeWith planInput $ \inP -> MS.unsafeWith planOutput $ \outP -> do
-    pPlan <- makePlanND (toEnum $ V.length dims) dimsP inP outP $ planInitFlags ptype DestroyInput
-    cPlan <- newPlan pPlan
-    -- Use unsafeWith here to ensure that the Storable MVectors' ForeignPtrs
-    -- aren't released too soon:
-    let planExecute = MS.unsafeWith planInput $ \_ ->
-                            MS.unsafeWith planOutput $ \_ ->
-                            withPlan cPlan fftw_execute
-    return $ normalizationND dims $ Plan {..}
+        pPlan <- makePlanND (toEnum $ V.length dims) dimsP inP outP $ planInitFlags ptype DestroyInput
+        cPlan <- newPlan pPlan
+        -- Use unsafeWith here to ensure that the Storable MVectors' ForeignPtrs
+        -- aren't released too soon:
+        let planExecute = MS.unsafeWith planInput $ \_ ->
+                                MS.unsafeWith planOutput $ \_ ->
+                                withPlan cPlan fftw_execute
+        return $ normalizationND dims $ Plan {..}
   where
     m = V.product $ V.init dims
     m_in = m * inputSizeND (V.last dims)
