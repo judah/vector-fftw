@@ -15,7 +15,7 @@ Synopsis:            A binding to the fftw library for one-dimensional vectors.
 Description:         This package provides bindings to the fftw library for one-dimensional vectors.
                      It provides both high-level functions and more low-level manipulation of fftw plans.
                      .
-                     We provide three different modules which wrap fftw's operations:
+                     We provide three different modules which wrap @fftw@'s operations:
                      .
                       - "Numeric.FFT.Vector.Unnormalized" contains the raw transforms;
                      .
@@ -23,6 +23,9 @@ Description:         This package provides bindings to the fftw library for one-
                      .
                       - "Numeric.FFT.Vector.Unitary" additionally scales all transforms to preserve the L2 (sum-of-squares) norm of the
                         input.
+                     .
+                     In addition, we provide @.Multi@ modules for each of these providing multi-dimensional
+                     transforms.
 Extra-Source-Files:  Changelog.md
 Tested-With:         GHC == 7.6.2, GHC == 7.8.4, GHC == 7.10.3, GHC == 8.0.1, GHC == 8.6.4, GHC == 8.8.3, GHC == 8.10.1
 
