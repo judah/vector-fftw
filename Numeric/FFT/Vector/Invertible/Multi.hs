@@ -6,6 +6,8 @@ The backwards transforms are normalized to be their inverse operations (approxim
 
 For more information on the underlying transforms, see
 <http://www.fftw.org/fftw3_doc/What-FFTW-Really-Computes.html>.
+
+@since 0.2
 -}
 
 module Numeric.FFT.Vector.Invertible.Multi

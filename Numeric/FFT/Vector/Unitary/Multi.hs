@@ -11,6 +11,8 @@ All of the transforms are normalized so that
 
 For more information on the underlying transforms, see
 <http://www.fftw.org/fftw3_doc/What-FFTW-Really-Computes.html>.
+--
+-- @since 0.2
 -}
 
 module Numeric.FFT.Vector.Unitary.Multi

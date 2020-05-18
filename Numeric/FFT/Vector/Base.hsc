@@ -222,6 +222,8 @@ run p = \v -> execute
 -- TransformND: methods of plan creation for multi-dimensional plans.
 
 -- | A transform which may be applied to vectors of different sizes.
+--
+-- @since 0.2
 data TransformND a b = TransformND {
                         inputSizeND :: Int -> Int,
                         outputSizeND :: Int -> Int,
@@ -232,6 +234,8 @@ data TransformND a b = TransformND {
 
 -- | Create a 'Plan' of a specific size for this transform.
 -- 'dims' must have rank greater or equal to 1
+--
+-- @since 0.2
 planOfTypeND :: (Storable a, Storable b) => PlanType
                                 -> TransformND a b -> VS.Vector Int -> Plan a b
 planOfTypeND ptype TransformND{..} dims
@@ -257,11 +261,15 @@ planOfTypeND ptype TransformND{..} dims
 
 -- | Create a 'Plan' of a specific size.  This function is equivalent to
 -- @'planOfType' 'Estimate'@.
+--
+-- @since 0.2
 planND :: (Storable a, Storable b) => TransformND a b -> VS.Vector Int -> Plan a b
 planND = planOfTypeND Estimate
 {-# INLINE planND #-}
 
 -- | Create and run a 'Plan' for the given transform.
+--
+-- @since 0.2
 runND :: (Vector v a, Vector v b, Storable a, Storable b)
             => TransformND a b -> VS.Vector Int ->  v a -> v b
 runND p = \dims v ->

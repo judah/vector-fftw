@@ -6,6 +6,8 @@ inverses.  For example, @run idft (run dft v) /= v@ in general.
 
 For more information on the individual transforms, see
 <http://www.fftw.org/fftw3_doc/What-FFTW-Really-Computes.html>.
+
+@since 0.2
 -}
 
 module Numeric.FFT.Vector.Unnormalized.Multi
