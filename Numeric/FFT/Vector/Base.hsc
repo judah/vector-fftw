@@ -6,6 +6,11 @@ module Numeric.FFT.Vector.Base(
             PlanType(..),
             plan,
             run,
+            -- * multi-demensional Transforms
+            TransformND(..),
+            planOfTypeND,
+            planND,
+            runND,
             -- * Plans
             Plan(),
             planInputSize,
@@ -186,14 +191,14 @@ planOfType ptype Transform{..} n
     planInput <- newFFTVector m_in
     planOutput <- newFFTVector m_out
     MS.unsafeWith planInput $ \inP -> MS.unsafeWith planOutput $ \outP -> do
-    pPlan <- makePlan (toEnum n) inP outP $ planInitFlags ptype DestroyInput
-    cPlan <- newPlan pPlan
-    -- Use unsafeWith here to ensure that the Storable MVectors' ForeignPtrs
-    -- aren't released too soon:
-    let planExecute = MS.unsafeWith planInput $ \_ ->
-                        MS.unsafeWith planOutput $ \_ ->
-                          withPlan cPlan fftw_execute
-    return $ normalization n $ Plan {..}
+        pPlan <- makePlan (toEnum n) inP outP $ planInitFlags ptype DestroyInput
+        cPlan <- newPlan pPlan
+        -- Use unsafeWith here to ensure that the Storable MVectors' ForeignPtrs
+        -- aren't released too soon:
+        let planExecute = MS.unsafeWith planInput $ \_ ->
+                            MS.unsafeWith planOutput $ \_ ->
+                                withPlan cPlan fftw_execute
+        return $ normalization n $ Plan {..}
   where
     m_in = inputSize n
     m_out = outputSize n
@@ -212,6 +217,59 @@ run p = \v -> execute
             (planOfType Estimate p $ creationSizeFromInput p $ V.length v)
             v
 {-# INLINE run #-}
+
+-----------------------
+-- TransformND: methods of plan creation for multi-dimensional plans.
+
+-- | A transform which may be applied to vectors of different sizes.
+data TransformND a b = TransformND {
+                        inputSizeND :: Int -> Int,
+                        outputSizeND :: Int -> Int,
+                        creationSizeFromInputND :: Int -> Int,
+                        makePlanND :: CInt -> Ptr CInt -> Ptr a -> Ptr b -> CFlags -> IO (Ptr CPlan),
+                        normalizationND :: VS.Vector Int -> Plan a b -> Plan a b
+                    }
+
+-- | Create a 'Plan' of a specific size for this transform.
+-- 'dims' must have rank greater or equal to 1
+planOfTypeND :: (Storable a, Storable b) => PlanType
+                                -> TransformND a b -> VS.Vector Int -> Plan a b
+planOfTypeND ptype TransformND{..} dims
+  | m_in <= 0 || m_out <= 0 = error "Can't (yet) plan for empty arrays!"
+  | otherwise  = unsafePerformIO $ do
+    mdims <- unsafeThaw $ V.map toEnum dims
+    planInput <- newFFTVector m_in
+    planOutput <- newFFTVector m_out
+    MS.unsafeWith mdims $ \dimsP -> MS.unsafeWith planInput $ \inP -> MS.unsafeWith planOutput $ \outP -> do
+        pPlan <- makePlanND (toEnum $ V.length dims) dimsP inP outP $ planInitFlags ptype DestroyInput
+        cPlan <- newPlan pPlan
+        -- Use unsafeWith here to ensure that the Storable MVectors' ForeignPtrs
+        -- aren't released too soon:
+        let planExecute = MS.unsafeWith planInput $ \_ ->
+                                MS.unsafeWith planOutput $ \_ ->
+                                withPlan cPlan fftw_execute
+        return $ normalizationND dims $ Plan {..}
+  where
+    m = V.product $ V.init dims
+    m_in = m * inputSizeND (V.last dims)
+    m_out = m * outputSizeND (V.last dims)
+{-# INLINE planOfTypeND #-}
+
+-- | Create a 'Plan' of a specific size.  This function is equivalent to
+-- @'planOfType' 'Estimate'@.
+planND :: (Storable a, Storable b) => TransformND a b -> VS.Vector Int -> Plan a b
+planND = planOfTypeND Estimate
+{-# INLINE planND #-}
+
+-- | Create and run a 'Plan' for the given transform.
+runND :: (Vector v a, Vector v b, Storable a, Storable b)
+            => TransformND a b -> VS.Vector Int ->  v a -> v b
+runND p = \dims v ->
+  let creationSize = V.init dims `V.snoc` creationSizeFromInputND p (V.last dims) in
+    execute
+    (planOfTypeND Estimate p creationSize)
+    v
+{-# INLINE runND #-}
 
 ---------------------------
 -- For scaling input/output:

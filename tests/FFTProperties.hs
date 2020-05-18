@@ -1,8 +1,11 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 -- This module uses the test-framework-quickcheck2 package.
 module Main where
 
+import Control.Monad
 import qualified Data.Vector.Unboxed as V
+import qualified Data.Vector.Storable as VS
 import Data.Complex
 
 import Test.Framework (defaultMain, testGroup)
@@ -10,7 +13,9 @@ import Test.Framework.Providers.QuickCheck2 (testProperty)
 import Test.QuickCheck
 
 import qualified Numeric.FFT.Vector.Invertible as I
+import qualified Numeric.FFT.Vector.Invertible.Multi as IM
 import qualified Numeric.FFT.Vector.Unitary as U
+import qualified Numeric.FFT.Vector.Unitary.Multi as UM
 import Numeric.FFT.Vector.Plan
 
 main = defaultMain
@@ -40,6 +45,18 @@ main = defaultMain
               , testProperty "U.dct2" $ prop_orthog U.dct2
               , testProperty "U.idct2" $ prop_orthog U.idct2
               , testProperty "U.dct4" $ prop_orthog U.dct4
+              ]
+            , testGroup "invertibility ND"
+              [ testProperty "IM.dft" $ prop_invertND IM.dft IM.idft
+              , testProperty "IM.dftR2C" $ prop_invertND IM.dftR2C IM.dftC2R
+              , testProperty "UM.dft" $ prop_invertND UM.dft UM.idft
+              , testProperty "UM.dftR2C" $ prop_invertND UM.dftR2C UM.dftC2R
+              ]
+            , testGroup "orthogonality"
+              [ testProperty "UM.dft" $ prop_orthogND UM.dft
+              , testProperty "UM.idft" $ prop_orthogND UM.idft
+              , testProperty "UM.dftR2C" $ prop_orthogND UM.dftR2C
+              , testProperty "UM.dftC2R" $ prop_orthogND UM.dftR2C
               ]
             ]
 
@@ -86,6 +103,28 @@ prop_invert f g a = let
 -- Test whether the transform preserves the L2 (sum-of-squares) norm.
 prop_orthog f a = let
                     p1 = plan f (V.length a)
+                  in (V.length a > 1) ==> close (norm2 a) (norm2 $ execute p1 a)
+
+data DimsAndValues a = DimsAndValues (VS.Vector Int) (V.Vector a)
+  deriving (Show)
+
+instance (Arbitrary a, V.Unbox a) => Arbitrary (DimsAndValues a) where
+  arbitrary = do
+    dims <- liftM (VS.fromList . map getPositive) arbitrary `suchThatMap` maybeReduceSize
+    values <- V.replicateM (VS.product dims) arbitrary
+    return (DimsAndValues dims values)
+    where
+      -- We use this to prevent test cases from growing too big
+      maybeReduceSize ds =
+        if VS.product ds < 1000 then Just ds else maybeReduceSize (VS.init ds)
+
+prop_invertND f g (DimsAndValues ds a) = let
+                        p1 = planND f ds
+                        p2 = planND g ds
+                    in (V.length a > 1) ==> withinTol a $ execute p2 $ execute p1 a
+
+prop_orthogND f (DimsAndValues ds a) = let
+                    p1 = planND f ds
                   in (V.length a > 1) ==> close (norm2 a) (norm2 $ execute p1 a)
 
 norm2 a = sqrt $ V.sum $ V.map (\x -> x*x) $ V.map mag a

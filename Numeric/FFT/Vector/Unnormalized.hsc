@@ -107,6 +107,7 @@ dftC2R = Transform {
             normalization = const id
         }
 
+
 r2rTransform :: CKind -> Transform Double Double
 r2rTransform kind = Transform {
                     inputSize = id,
