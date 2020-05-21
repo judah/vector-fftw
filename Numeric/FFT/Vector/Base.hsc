@@ -41,7 +41,7 @@ import Control.Monad.Primitive (RealWorld,PrimMonad(..), PrimBase,
 import Control.Monad(forM_)
 import Foreign (Storable(..), Ptr, FunPtr,
                 ForeignPtr, withForeignPtr, newForeignPtr)
-import Foreign.C (CInt(..), CUInt)
+import Foreign.C (CInt(..), CUInt, CSize(..))
 import Data.Bits ( (.|.) )
 import Data.Complex(Complex(..))
 import Foreign.Storable.Complex()
@@ -159,7 +159,7 @@ executeM Plan{..} = \vIn vOut ->
 ------------------
 -- Malloc/free of fftw array
 
-foreign import ccall unsafe fftw_malloc :: CInt -> IO (Ptr a)
+foreign import ccall unsafe fftw_malloc :: CSize -> IO (Ptr a)
 foreign import ccall "&" fftw_free :: FunPtr (Ptr a -> IO ())
 
 newFFTVector :: forall a . Storable a => Int -> IO (MS.MVector RealWorld a)
