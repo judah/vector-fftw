@@ -34,9 +34,6 @@ import Data.Complex
 -- | Whether the complex fft is forwards or backwards.
 type CDirection = CInt
 
--- | The type of the cosine or sine transform.
-type CKind = (#type fftw_r2r_kind)
-
 foreign import ccall unsafe fftw_plan_dft
     :: CInt -> Ptr CInt -> Ptr (Complex Double) -> Ptr (Complex Double)
         -> CDirection -> CFlags -> IO (Ptr CPlan)
